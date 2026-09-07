@@ -1,0 +1,41 @@
+{
+  "artifact_id": 10030990682,
+  "artifact_sha256": "38b187282079efb2fe97cd4f04407910ab4d36a5f86d856c601874d793b2ecf3",
+  "attempt": 6,
+  "blocked_workflow": {
+    "check_suite_id": 92526960720,
+    "conclusion": "action_required",
+    "event": "pull_request",
+    "run_id": 34155960423
+  },
+  "cause": "The general CI workflow matches disposable PR bases and creates an action_required suite for the bot-created PR, despite a successful separately dispatched exact-head check.",
+  "claim_boundary": "No live merge-effect or closure result was earned; the original artifact remains authoritative.",
+  "error_code": "GITHUB_PR_NOT_READY",
+  "experiment_id": "PROVIDER-EFFECT-LIVE-001",
+  "head_check": {
+    "conclusion": "success",
+    "job_id": 101847721968,
+    "run_id": 34155959225
+  },
+  "observed_readiness": {
+    "mergeable": true,
+    "mergeable_state": "unstable"
+  },
+  "preregistration_sha256": "c62672067d667bf245fea438a5a53cd8c2a3ee7a061eb7ffd15b38e4c3ef985f",
+  "provider_merge_requests": 0,
+  "run_head": "b82342fc3c39c0ebef90f852df0fca74f465911b",
+  "run_id": 34155925636,
+  "run_url": "https://github.com/terryncew/openline-provider-sandbox/actions/runs/34155925636",
+  "schema": "openline.wallet.provider_live_attempt.v1",
+  "source_commit": "c35e7f427a26cddfc4e7d300a74b84aacc0ea64e",
+  "target": {
+    "base_ref": "olp-test-34155925636-base",
+    "base_sha": "b82342fc3c39c0ebef90f852df0fca74f465911b",
+    "head_ref": "olp-test-34155925636-head",
+    "head_sha": "2aa204cbaed2f1164b0d9ce122392e73ca8b6f4a",
+    "number": 7,
+    "repository": "terryncew/openline-provider-sandbox",
+    "repository_id": 1360489534
+  },
+  "verdict": "INCONCLUSIVE"
+}
