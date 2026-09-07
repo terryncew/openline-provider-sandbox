@@ -1,0 +1,23 @@
+{
+  "actual_provider_error": "GITHUB_HTTP_403",
+  "artifact_id": 10030071641,
+  "artifact_sha256": "e93ee6564725ee449fc0a182196e78d5b9d8f14252e502b11f70995736a4d17f",
+  "attempt": 3,
+  "base_ref": "olp-test-34153215260-base",
+  "bootstrap_mutations": 4,
+  "experiment_id": "PROVIDER-EFFECT-LIVE-001",
+  "failure_boundary": "POST /pulls rejected; the launcher's incompatible exception kwargs masked the HTTP error",
+  "head_ref": "olp-test-34153215260-head",
+  "interpretation": "Repository permission blocks PR creation. No Wallet merge frontier reached. Original artifact remains authoritative.",
+  "next_attempt": "Fresh workflow run only after the setting is confirmed. Do not replay the existing target.",
+  "preregistration_sha256": "c62672067d667bf245fea438a5a53cd8c2a3ee7a061eb7ffd15b38e4c3ef985f",
+  "provider_merge_requests": 0,
+  "provider_message": "GitHub Actions is not permitted to create or approve pull requests.",
+  "reported_error": "TypeError",
+  "required_external_action": "Enable Allow GitHub Actions to create and approve pull requests in repository Settings > Actions > General > Workflow permissions.",
+  "run_head": "966ebd17166f606c8766808523d258abef5ea7af",
+  "run_id": 34153215260,
+  "run_url": "https://github.com/terryncew/openline-provider-sandbox/actions/runs/34153215260",
+  "source_commit": "c35e7f427a26cddfc4e7d300a74b84aacc0ea64e",
+  "verdict": "INCONCLUSIVE"
+}

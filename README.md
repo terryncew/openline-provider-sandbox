@@ -42,3 +42,32 @@ fields, signed receipt bindings, effect-to-closure linkage, and monotonic
 held-acknowledgement timing. A controlled fixture test cannot establish a live
 provider result. The real merge and independent GitHub state reconciliation
 remain required before freezing a live claim.
+
+## Attempt 3: confirmed repository permission blocker
+
+Run `34153215260` completed all 80 pinned Wallet tests, all 25 sandbox
+tests, and compilation before the live step. It created two disposable
+branches and one harmless file commit. GitHub then returned HTTP 403:
+
+    GitHub Actions is not permitted to create or approve pull requests.
+
+The launcher incorrectly passed `status` and `request_id` keywords to an
+exception constructor that accepts `details`, masking the 403 as a TypeError.
+The original artifact is preserved and the exact error is recorded in
+`proofs/provider-effect-live-001/attempt-3.json`. No provider merge request
+was sent and no Wallet effect-closure result was obtained.
+
+The exception contract and sanitized diagnostics are now covered by
+regressions for HTTP 403, HTTP 500, secret-bearing error messages, complete
+CLI failure evidence, and unexpected exceptions. These repairs do not alter
+the Wallet implementation or the preregistered experiment.
+
+**The next run is blocked on repository configuration.** In this sandbox's
+Settings → Actions → General → Workflow permissions, enable
+“Allow GitHub Actions to create and approve pull requests” and save.
+The workflow already requests the necessary Contents and Pull requests write
+permissions; those declarations cannot override this separate restriction.
+Do not expand credentials, disable branch protections, or substitute a manual
+merge for the controlled experiment. After confirming the setting, run a fresh
+workflow with a new disposable target. If permission is still denied, retain
+the new failure evidence rather than repeating the mutation.
