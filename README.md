@@ -71,3 +71,29 @@ Do not expand credentials, disable branch protections, or substitute a manual
 merge for the controlled experiment. After confirming the setting, run a fresh
 workflow with a new disposable target. If permission is still denied, retain
 the new failure evidence rather than repeating the mutation.
+
+## Attempt 5: the missing head-check boundary
+
+Run `34154199328` passed all upstream and sandbox tests and created disposable
+PR #5 successfully. The frozen Wallet discovery then waited for readiness and
+returned `WalletError`. Its source rejects `mergeable_state=unstable`. Independent
+GitHub reads confirmed that PR #5 is open, unmerged and conflict-free, but its
+exact head has zero check runs and no commit statuses. The head was created with
+`GITHUB_TOKEN`; the ordinary CI branch filters exclude `olp-test-*`, so the
+required evaluation had not been produced. The original receipt remains
+INCONCLUSIVE and its precise Wallet error code was not recorded.
+
+The repair is a dedicated read-only workflow dispatched on the exact newly
+created head. It runs the pinned Wallet suite, the sandbox suite, the source
+pin, and compilation. The parent requires the real GitHub workflow, job, and
+published check to succeed before repeating the unchanged Wallet discovery.
+A failed, skipped, ambiguous, or missing check cannot authorize the merge.
+The child has Contents read permission only; the parent adds Actions write
+solely to dispatch that fixed workflow. No personal access token is needed.
+
+The original `mergeable_state` rejection is not relaxed. If the provider still
+reports unstable after genuine checks pass, preserve the new diagnostics and
+stop. Do not invent a successful status, disable protections, use a manual
+merge, or retry the old PR. The next run creates a fresh disposable target.
+The only claim available remains the one actually established by the external
+merge and signed closure evidence; this patch itself earns no live result.

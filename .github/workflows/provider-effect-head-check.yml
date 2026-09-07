@@ -1,0 +1,56 @@
+name: PROVIDER-EFFECT-HEAD-CHECK
+run-name: Provider head check ${{ inputs.parent_run_id }}
+on:
+  workflow_dispatch:
+    inputs:
+      parent_run_id:
+        description: 'Parent disposable experiment run ID'
+        required: true
+        type: string
+      head_sha:
+        description: 'Exact disposable commit SHA'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  check:
+    name: provider-head-check-${{ inputs.parent_run_id }}
+    if: github.repository == 'terryncew/openline-provider-sandbox' && github.ref == format('refs/heads/olp-test-{0}-head', inputs.parent_run_id) && github.sha == inputs.head_sha
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify disposable source identity
+        env:
+          EXPECTED_SHA: ${{ inputs.head_sha }}
+          PARENT_RUN_ID: ${{ inputs.parent_run_id }}
+        run: |
+          python - <<'PY'
+          import os, re
+          assert re.fullmatch(r'[1-9][0-9]{0,19}', os.environ['PARENT_RUN_ID'])
+          assert re.fullmatch(r'[0-9a-f]{40}', os.environ['EXPECTED_SHA'])
+          assert os.environ['GITHUB_SHA'] == os.environ['EXPECTED_SHA']
+          assert os.environ['GITHUB_REF'] == 'refs/heads/olp-test-' + os.environ['PARENT_RUN_ID'] + '-head'
+          PY
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.head_sha }}
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: terryncew/openline-wallet
+          ref: c35e7f427a26cddfc4e7d300a74b84aacc0ea64e
+          path: wallet
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install "./wallet[mcp]"
+      - name: Verify pinned Wallet source
+        run: test "$(git -C wallet rev-parse HEAD)" = "c35e7f427a26cddfc4e7d300a74b84aacc0ea64e"
+      - name: Test pinned Wallet downstream suite
+        run: python -m unittest discover -s wallet/tests -v
+      - name: Test sandbox downstream suite
+        run: python -m unittest discover -s tests -v
+      - name: Compile launcher
+        run: python -m compileall -q scripts tests
