@@ -1,0 +1,5 @@
+{
+  "schema": "openline.wallet.disposable_provider_sandbox.v1",
+  "repository": "terryncew/openline-provider-sandbox",
+  "purpose": "Disposable GitHub merge experiments; no production data"
+}
