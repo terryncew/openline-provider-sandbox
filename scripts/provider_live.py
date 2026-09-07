@@ -27,7 +27,11 @@ MAX_RESPONSE = 2 * 1024 * 1024
 
 
 class ExperimentError(Exception):
-    pass
+    def __init__(self, code, *, details=None):
+        self.code = code
+        self.details = details or {}
+        super().__init__(code)
+
 
 
 def require(ok, code):
@@ -107,10 +111,20 @@ class GitHubAPI:
                 self.observations.append(dict(observation))
                 return value
         except HTTPError as exc:
+            try:
+                raw_error = exc.read(8193)
+                if len(raw_error) <= 8192:
+                    error_body = json.loads(raw_error)
+                    message = error_body.get("message") if isinstance(error_body, dict) else None
+                    if isinstance(message, str):
+                        observation["error_message"] = message.replace(self.token, "[REDACTED]")[:512]
+            except (ValueError, OSError, UnicodeError):
+                pass
             observation.update(status=exc.code, duration_ns=time.monotonic_ns()-started,
                 request_id=exc.headers.get("X-GitHub-Request-Id"))
             self.observations.append(dict(observation))
-            raise ExperimentError("GITHUB_HTTP_" + str(exc.code)) from None
+            raise ExperimentError("GITHUB_HTTP_" + str(exc.code), status=exc.code,
+                request_id=exc.headers.get("X-GitHub-Request-Id")) from None
         except (URLError, TimeoutError, OSError):
             observation.update(status="UNKNOWN", duration_ns=time.monotonic_ns()-started)
             self.observations.append(dict(observation))
@@ -209,6 +223,9 @@ def verify_observation(evidence, plan, api=None):
     from openline_wallet.clock import parse_time
     result = evidence["result"]
     require(verify_record(result)[0], "RESULT_SIGNATURE_INVALID")
+    require(result["experiment_id"] == "PROVIDER-EFFECT-001", "EXPERIMENT_ID_MISMATCH")
+    require(result["base_commit"] == "ec385ce2c0cdc253d5e634d1963f254203205e30",
+            "EVIDENCE_SOURCE_BOUNDARY_INVALID")
     require(result["verdict"] == "LIVE_GITHUB_MERGE_OBSERVED" and
             result["transport"] == "github", "LIVE_RESULT_INCOMPLETE")
     directory = evidence["directory"]
@@ -227,18 +244,44 @@ def verify_observation(evidence, plan, api=None):
     key = effect["gate_public_key"]
     for record in (effect, evidence["effect_b"]["receipt"], evidence["admission_b"], closure):
         require(verify_record(record, expected_public_key=key)[0], "SIGNED_EVIDENCE_INVALID")
+    key_a = evidence["admission_a"]["gate_public_key"]
     for record in (evidence["closure_a"], evidence["stopped_a"]["receipt"], evidence["admission_a"]):
-        require(verify_record(record)[0], "SIGNED_EVIDENCE_INVALID")
+        require(verify_record(record, expected_public_key=key_a)[0], "SIGNED_EVIDENCE_INVALID")
+    require(evidence["closure_a"]["gate_public_key"] == key_a and
+            evidence["closure_a"]["principal_id"] == evidence["admission_a"]["principal_id"],
+            "CLOSURE_A_BINDING_INVALID")
     bundle = evidence["revoked_b"]
     verified_bundle, timeline = verify_bundle(bundle, now=parse_time(bundle["issued_at"]), require_fresh=False)
     require(timeline.mandates[effect["mandate_id"]]["status"] == "REVOKED" and
-            verified_bundle["principal_id"] == effect["principal_id"] and
+            verified_bundle["principal"]["principal_id"] == effect["principal_id"] and
             closure["mandate_id"] == effect["mandate_id"] and
             closure["status"] == "EFFECT_CLOSED" and closure["active_frontiers"] == 0 and
             record_hash(effect) in closure["confirmed_effect_hashes"], "CLOSURE_EVIDENCE_INVALID")
     require(effect["target"]["repository_id"] == plan["repository_id"] and
             effect["target"]["head_sha"] == plan["head_sha"] and
             effect["merge_commit"]["parents"][1] == plan["head_sha"], "EFFECT_TARGET_INVALID")
+    require(evidence["stopped_a"]["decision"] == "STOPPED" and
+            evidence["stopped_a"]["effect_applied"] is False and
+            evidence["closure_a"]["status"] == "EFFECT_CLOSED" and
+            evidence["closure_a"]["active_frontiers"] == 0, "PRE_DISPATCH_CONTROL_INVALID")
+    require(evidence["effect_b"]["decision"] == "ALLOWED" and
+            evidence["effect_b"]["effect_applied"] is True and
+            evidence["errors"] == [] and evidence["wallet_receipt_count"] >= 2,
+            "EFFECT_RESULT_INVALID")
+    timing = evidence["timing"]
+    require(all(type(timing.get(k)) is int for k in
+            ("ack_observed_ns", "revocation_requested_ns", "closure_requested_ns",
+             "ack_released_ns", "closure_returned_ns")) and
+            timing["ack_observed_ns"] <= timing["revocation_requested_ns"] <=
+            timing["closure_requested_ns"] <= timing["ack_released_ns"] <=
+            timing["closure_returned_ns"], "CLOSURE_TIMING_INVALID")
+    require(closure["principal_id"] == effect["principal_id"] and
+            closure["gate_id"] == effect["gate_id"] and
+            closure["gate_public_key"] == key and
+            closure["target"] == effect["target"] and
+            closure["head_sequence"] == verified_bundle["head"]["sequence"] and
+            closure["head_hash"] == verified_bundle["head"]["event_hash"],
+            "CLOSURE_BINDING_INVALID")
     observation = {"verdict": "LIVE_GITHUB_MERGE_OBSERVED",
         "scope": "ONE_DISPOSABLE_PR_HELD_ACKNOWLEDGEMENT",
         "merge_commit_sha": b["merge_commit_sha"], "repository_id": plan["repository_id"],

@@ -1,0 +1,22 @@
+{
+  "artifact_id": 10028537414,
+  "artifact_sha256": "9c1aa63ef99ed260989be346b6acb995159ccdf3453a0dee3f60e52392289c81",
+  "attempt": 2,
+  "base_ref": "olp-test-34148571761-base",
+  "base_sha": "3673d40983039a5d9c5aafbc6ca767c875bd3f4e",
+  "bootstrap_mutations": 4,
+  "experiment_id": "PROVIDER-EFFECT-LIVE-001",
+  "failure_boundary": "POST /pulls rejected after both refs and the harmless file commit succeeded",
+  "head_ref": "olp-test-34148571761-head",
+  "head_sha": "bf587b493fa9e8fd0320a972e62987f93ac79e91",
+  "interpretation": "PR creation permission/configuration failure; no Wallet effect frontier was reached.",
+  "next_attempt": "Use a new run ID after repository Actions PR creation is enabled. Never reuse this target.",
+  "preregistration_sha256": "c62672067d667bf245fea438a5a53cd8c2a3ee7a061eb7ffd15b38e4c3ef985f",
+  "provider_merge_requests": 0,
+  "reason": "GITHUB_HTTP_403",
+  "run_head": "3673d40983039a5d9c5aafbc6ca767c875bd3f4e",
+  "run_id": 34148571761,
+  "run_url": "https://github.com/terryncew/openline-provider-sandbox/actions/runs/34148571761",
+  "source_commit": "c35e7f427a26cddfc4e7d300a74b84aacc0ea64e",
+  "verdict": "INCONCLUSIVE"
+}
