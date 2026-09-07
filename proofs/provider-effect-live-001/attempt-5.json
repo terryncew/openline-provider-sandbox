@@ -1,0 +1,33 @@
+{
+  "artifact_id": 10030409724,
+  "artifact_sha256": "677c7a1552503a3ccaa422b9263d20e8a69819ed468d0aca9d8fbe30315b39d0",
+  "attempt": 5,
+  "bootstrap_mutations": 4,
+  "diagnosis": "The frozen discovery rejects GitHub mergeable_state=unstable. The exact disposable head had no check runs or statuses; the original 60-second readiness wait expired.",
+  "diagnosis_source": "Pinned github_effect_live.py and independent GitHub PR/check reads",
+  "exact_wallet_code": "UNRECORDED_IN_ORIGINAL_ARTIFACT",
+  "experiment_id": "PROVIDER-EFFECT-LIVE-001",
+  "interpretation": "The safety preflight correctly refused to promote an unqualified provider state. No Wallet effect closure was exercised.",
+  "next_attempt": "Run real read-only checks on a fresh exact disposable head, then repeat the unchanged frozen discovery. No reuse or manual merge of PR #5.",
+  "preregistration_sha256": "c62672067d667bf245fea438a5a53cd8c2a3ee7a061eb7ffd15b38e4c3ef985f",
+  "provider_merge_requests": 0,
+  "provider_observation": {
+    "base_protected": false,
+    "base_ref": "olp-test-34154199328-base",
+    "base_sha": "ab2d394572cd5ec75ae5d73a15e61f691babadae",
+    "head_check_runs": 0,
+    "head_ref": "olp-test-34154199328-head",
+    "head_sha": "a50b35621b8cc43c896369753d7675e9545a24fa",
+    "head_statuses": 0,
+    "mergeable": true,
+    "mergeable_state": "unstable",
+    "merged": false,
+    "pr_number": 5
+  },
+  "reported_error": "WalletError",
+  "run_head": "ab2d394572cd5ec75ae5d73a15e61f691babadae",
+  "run_id": 34154199328,
+  "run_url": "https://github.com/terryncew/openline-provider-sandbox/actions/runs/34154199328",
+  "source_commit": "c35e7f427a26cddfc4e7d300a74b84aacc0ea64e",
+  "verdict": "INCONCLUSIVE"
+}

@@ -162,7 +162,8 @@ class DispatchBoundaryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             public=Path(td)/'public';private=Path(td)/'private'
             public.mkdir();private.mkdir()
-            with patch.object(mod,'wait_for_target',return_value=(type('Target',(),{'to_record':lambda self:{'repository':mod.SANDBOX,'number':7}})(),{})),\
+            with patch.object(mod,'run_head_check',return_value={'status':'COMPLETE'}),\
+                 patch.object(mod,'wait_for_target',return_value=(type('Target',(),{'to_record':lambda self:{'repository':mod.SANDBOX,'number':7}})(),{})),\
                  patch.object(live,'run_experiment',side_effect=RuntimeError('uncertain')) as run,\
                  patch.object(live,'recover',return_value={'phases':[],'effect_authority':'NONE'}) as recover:
                 with self.assertRaisesRegex(RuntimeError,'uncertain'):
@@ -177,7 +178,8 @@ class DispatchBoundaryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             public=Path(td)/'public';private=Path(td)/'private'
             public.mkdir();private.mkdir()
-            with patch.object(mod,'wait_for_target',return_value=(type('Target',(),{'to_record':lambda self:{'repository':mod.SANDBOX,'number':7}})(),{})),\
+            with patch.object(mod,'run_head_check',return_value={'status':'COMPLETE'}),\
+                 patch.object(mod,'wait_for_target',return_value=(type('Target',(),{'to_record':lambda self:{'repository':mod.SANDBOX,'number':7}})(),{})),\
                  patch.object(live,'run_experiment',return_value={'verdict':'LIVE_GITHUB_MERGE_OBSERVED'}) as run,\
                  patch.object(mod,'verify_observation',side_effect=mod.ExperimentError('BAD_EVIDENCE')),\
                  patch.object(live,'recover',return_value={'phases':[],'effect_authority':'NONE'}) as recover:

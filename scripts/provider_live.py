@@ -18,6 +18,12 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
+# The launcher is also imported directly by its regression suite.
+_SCRIPT_DIR = str(Path(__file__).resolve().parent)
+if _SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPT_DIR)
+from provider_head_check import HeadCheckError, run_head_check
+
 SOURCE_COMMIT = "c35e7f427a26cddfc4e7d300a74b84aacc0ea64e"
 SANDBOX = "terryncew/openline-provider-sandbox"
 MARKER = "openline.wallet.disposable_provider_sandbox.v1"
@@ -79,14 +85,24 @@ class GitHubAPI:
         allowed = {
             ("GET", ""), ("GET", "/contents/SANDBOX.json"),
             ("POST", "/git/refs"), ("POST", "/pulls"),
+            ("POST", "/actions/workflows/provider-effect-head-check.yml/dispatches"),
         }
         permitted = (method, suffix) in allowed or (
             method == "GET" and (re.fullmatch(r"/git/ref/heads/[A-Za-z0-9-]+", suffix)
                                  or re.fullmatch(r"/pulls/[0-9]+", suffix)
-                                 or re.fullmatch(r"/git/commits/[0-9a-f]{40}", suffix))
+                                 or re.fullmatch(r"/git/commits/[0-9a-f]{40}", suffix)
+                                 or re.fullmatch(r"/commits/[0-9a-f]{40}/check-runs", suffix)
+                                 or re.fullmatch(r"/actions/runs/[1-9][0-9]{0,19}(/jobs)?", suffix))
         ) or (method == "PUT" and re.fullmatch(r"/contents/olp-test-[0-9]+\.txt", suffix))
         require(bool(permitted), "ENDPOINT_NOT_ALLOWED")
         require((method == "GET") == (body is None), "BODY_INVALID")
+        if suffix == "/actions/workflows/provider-effect-head-check.yml/dispatches":
+            inputs = body.get("inputs", {}) if isinstance(body, dict) else {}
+            run_id, head = inputs.get("parent_run_id"), inputs.get("head_sha")
+            require(isinstance(run_id, str) and RUN_ID.fullmatch(run_id) is not None
+                    and isinstance(head, str) and SHA.fullmatch(head) is not None
+                    and body == {"ref": "olp-test-" + run_id + "-head", "inputs": inputs}
+                    and set(inputs) == {"parent_run_id", "head_sha"}, "HEAD_CHECK_DISPATCH_INVALID")
         data = canonical(body) if body is not None else None
         path = "/repos/" + self.repository + suffix
         req = Request("https://api.github.com" + path, data=data, method=method,
@@ -104,8 +120,11 @@ class GitHubAPI:
             with self.opener.open(req, timeout=20) as response:
                 raw = response.read(MAX_RESPONSE + 1)
                 require(len(raw) <= MAX_RESPONSE, "RESPONSE_TOO_LARGE")
-                value = json.loads(raw)
-                require(isinstance(value, dict), "RESPONSE_INVALID")
+                if suffix == "/actions/workflows/provider-effect-head-check.yml/dispatches" and response.status == 204:
+                    value = {"status": 204}
+                else:
+                    value = json.loads(raw)
+                    require(isinstance(value, dict), "RESPONSE_INVALID")
                 observation.update(status=response.status, response_sha256=digest(raw),
                     duration_ns=time.monotonic_ns()-started,
                     request_id=response.headers.get("X-GitHub-Request-Id"))
@@ -133,6 +152,26 @@ class GitHubAPI:
             observation.update(status="UNKNOWN", duration_ns=time.monotonic_ns()-started)
             self.observations.append(dict(observation))
             raise ExperimentError("GITHUB_TRANSPORT_UNCERTAIN") from None
+
+    def dispatch_head_check(self, run_id, head_sha):
+        require(isinstance(run_id, str) and RUN_ID.fullmatch(run_id) is not None
+                and isinstance(head_sha, str) and SHA.fullmatch(head_sha) is not None,
+                "HEAD_CHECK_DISPATCH_INVALID")
+        return self.request("POST", "/actions/workflows/provider-effect-head-check.yml/dispatches",
+            {"ref": "olp-test-" + run_id + "-head",
+             "inputs": {"parent_run_id": run_id, "head_sha": head_sha}})
+
+    def head_check_run(self, run_id):
+        require(type(run_id) is int and run_id > 0, "HEAD_CHECK_RUN_ID_INVALID")
+        return self.request("GET", "/actions/runs/" + str(run_id))
+
+    def head_check_jobs(self, run_id):
+        require(type(run_id) is int and run_id > 0, "HEAD_CHECK_RUN_ID_INVALID")
+        return self.request("GET", "/actions/runs/" + str(run_id) + "/jobs")
+
+    def head_checks(self, sha):
+        require(isinstance(sha, str) and SHA.fullmatch(sha) is not None, "HEAD_CHECK_SHA_INVALID")
+        return self.request("GET", "/commits/" + sha + "/check-runs")
 
     def repo(self):
         return self.request("GET", "")
@@ -204,8 +243,9 @@ def bootstrap(api, run_id):
             "run_id": run_id, "bootstrap_observations": list(api.observations)}
 
 
-def wait_for_target(client, plan):
+def wait_for_target(client, plan, diagnostics=None):
     from openline_wallet.github_effect_live import discover_target
+    from openline_wallet.github_effect import MergeTarget, _snapshot
     from openline_wallet.errors import WalletError
     deadline = time.monotonic() + 60
     while True:
@@ -217,6 +257,19 @@ def wait_for_target(client, plan):
             return target, safety
         except WalletError as exc:
             if exc.code != "GITHUB_PR_NOT_READY" or time.monotonic() >= deadline:
+                if diagnostics is not None:
+                    record = {"wallet_code": exc.code, "effect_authority": "NONE"}
+                    try:
+                        target = MergeTarget(**{k: plan[k] for k in
+                            ("repository", "repository_id", "number", "head_sha", "base_ref", "base_sha")})
+                        pr = client.pr(target)
+                        record["provider_state"] = _snapshot(pr, target)
+                        record["mergeable"] = pr.get("mergeable")
+                        record["mergeable_state"] = pr.get("mergeable_state")
+                        record["draft"] = pr.get("draft")
+                    except Exception as diagnostic_error:
+                        record["diagnostic_error"] = getattr(diagnostic_error, "code", type(diagnostic_error).__name__)
+                    write_json(diagnostics, record)
                 raise
             time.sleep(2)
 
@@ -313,7 +366,8 @@ def execute(api, plan, private, public):
     from openline_wallet.github_effect import GitHubClient, _snapshot
     from openline_wallet.github_effect_live import run_experiment, recover
     client = GitHubClient(api.token)
-    target, safety = wait_for_target(client, plan)
+    run_head_check(api, plan, public)
+    target, safety = wait_for_target(client, plan, public / "target-preflight.json")
     write_json(public / "target.json", {"target": target.to_record(), "safety": safety, "effect_authority": "NONE"})
     # The only code path permitted to issue the merge PUT is the existing receiver.
     try:
@@ -360,8 +414,9 @@ def main(argv=None):
         report.update(execute(api, plan, private, public))
         report["status"] = "COMPLETE"
     except Exception as exc:
-        report["error_code"] = exc.code if isinstance(exc, ExperimentError) else type(exc).__name__
-        if isinstance(exc, ExperimentError):
+        code = getattr(exc, "code", None)
+        report["error_code"] = code if isinstance(code, str) and re.fullmatch(r"[A-Z][A-Z0-9_]{1,127}", code) else type(exc).__name__
+        if isinstance(exc, (ExperimentError, HeadCheckError)):
             report["error_details"] = exc.details
         else:
             # Preserve a useful source location without publishing exception
