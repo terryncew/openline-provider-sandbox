@@ -185,3 +185,105 @@ class DispatchBoundaryTests(unittest.TestCase):
                     mod.execute(api,{'repository':mod.SANDBOX,'number':7},private,public)
                 run.assert_called_once()
                 recover.assert_called_once()
+
+
+class HttpFailureDiagnosticsTests(unittest.TestCase):
+    """Reproduce the exact production 403 without contacting GitHub."""
+
+    def test_pr_creation_403_preserves_error_and_never_retries(self):
+        import io
+        from urllib.error import HTTPError
+        token = "private-test-token"
+        api = mod.GitHubAPI(token)
+        class Forbidden:
+            def __init__(self):
+                self.calls = []
+            def open(self, request, timeout):
+                self.calls.append(request)
+                body = json.dumps({"message":
+                    "GitHub Actions is not permitted to create or approve pull requests."}).encode()
+                raise HTTPError(request.full_url, 403, "Forbidden",
+                    {"X-GitHub-Request-Id": "test-request-403"}, io.BytesIO(body))
+        opener = Forbidden()
+        api.opener = opener
+        with self.assertRaises(mod.ExperimentError) as caught:
+            api.create_pr("olp-test-123-head", "olp-test-123-base", "123")
+        self.assertEqual(caught.exception.code, "GITHUB_HTTP_403")
+        self.assertEqual(caught.exception.details["status"], 403)
+        self.assertEqual(caught.exception.details["request_id"], "test-request-403")
+        self.assertIn("not permitted", caught.exception.details["message"])
+        self.assertEqual(len(opener.calls), 1)
+        self.assertEqual(len(api.mutations), 1)
+        self.assertEqual(api.observations[0]["status"], 403)
+        self.assertNotIn(token, json.dumps(api.observations))
+
+    def test_http_500_preserves_status_without_retry(self):
+        import io
+        from urllib.error import HTTPError
+        api = mod.GitHubAPI("private-test-token")
+        calls = []
+        class Broken:
+            def open(self, request, timeout):
+                calls.append(request)
+                raise HTTPError(request.full_url, 500, "Server Error",
+                    {"X-GitHub-Request-Id": "test-500"},
+                    io.BytesIO(b'{"message":"server failure"}'))
+        api.opener = Broken()
+        with self.assertRaises(mod.ExperimentError) as caught:
+            api.create_ref("olp-test-123-base", A)
+        self.assertEqual(caught.exception.code, "GITHUB_HTTP_500")
+        self.assertEqual(caught.exception.details["status"], 500)
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(len(api.mutations), 1)
+
+    def test_error_body_cannot_publish_token(self):
+        import io
+        from urllib.error import HTTPError
+        token = "private-test-token"
+        api = mod.GitHubAPI(token)
+        class Forbidden:
+            def open(self, request, timeout):
+                raise HTTPError(request.full_url, 403, "Forbidden", {},
+                    io.BytesIO(json.dumps({"message": "bad " + token}).encode()))
+        api.opener = Forbidden()
+        with self.assertRaises(mod.ExperimentError) as caught:
+            api.create_pr("olp-test-123-head", "olp-test-123-base", "123")
+        self.assertNotIn(token, json.dumps(caught.exception.details))
+        self.assertIn("[REDACTED]", caught.exception.details["message"])
+
+    def test_main_preserves_structured_http_error_and_evidence(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            output, state = root/"public", root/"private"
+            error = mod.ExperimentError("GITHUB_HTTP_403", details={
+                "status": 403, "request_id": "test-403",
+                "message": "GitHub Actions is not permitted to create or approve pull requests."})
+            with patch.dict("os.environ", {"OPENLINE_GITHUB_TOKEN": "private-test-token"}), \
+                 patch.object(mod, "bootstrap", side_effect=error) as bootstrap:
+                rc = mod.main(["--run-id","123","--output",str(output),
+                    "--state",str(state),"--confirm",mod.CONFIRM])
+            self.assertEqual(rc, 2)
+            bootstrap.assert_called_once()
+            summary=json.loads((output/"summary.json").read_text())
+            self.assertEqual(summary["error_code"], "GITHUB_HTTP_403")
+            self.assertEqual(summary["error_details"]["status"],403)
+            self.assertEqual(summary["status"],"INCONCLUSIVE")
+            self.assertEqual(summary["bootstrap_mutations"],0)
+            self.assertNotIn("private-test-token",(output/"summary.json").read_text())
+            self.assertTrue((output/"SHA256SUMS.txt").exists())
+            self.assertTrue((output/"bootstrap-http.json").exists())
+
+    def test_unexpected_exception_records_location_not_arguments(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            output, state = root/"public", root/"private"
+            with patch.dict("os.environ", {"OPENLINE_GITHUB_TOKEN": "private-test-token"}), \
+                 patch.object(mod, "bootstrap", side_effect=TypeError("private-test-token")):
+                rc=mod.main(["--run-id","123","--output",str(output),
+                    "--state",str(state),"--confirm",mod.CONFIRM])
+            self.assertEqual(rc,2)
+            summary=json.loads((output/"summary.json").read_text())
+            self.assertEqual(summary["error_code"],"TypeError")
+            self.assertEqual(summary["status"],"INCONCLUSIVE")
+            self.assertIn("error_location",summary)
+            self.assertNotIn("private-test-token",json.dumps(summary))

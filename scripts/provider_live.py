@@ -13,6 +13,7 @@ from pathlib import Path
 import re
 import sys
 import time
+import traceback
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import HTTPRedirectHandler, Request, build_opener
@@ -123,8 +124,11 @@ class GitHubAPI:
             observation.update(status=exc.code, duration_ns=time.monotonic_ns()-started,
                 request_id=exc.headers.get("X-GitHub-Request-Id"))
             self.observations.append(dict(observation))
-            raise ExperimentError("GITHUB_HTTP_" + str(exc.code), status=exc.code,
-                request_id=exc.headers.get("X-GitHub-Request-Id")) from None
+            raise ExperimentError("GITHUB_HTTP_" + str(exc.code), details={
+                "status": exc.code,
+                "request_id": exc.headers.get("X-GitHub-Request-Id"),
+                "message": observation.get("error_message"),
+            }) from None
         except (URLError, TimeoutError, OSError):
             observation.update(status="UNKNOWN", duration_ns=time.monotonic_ns()-started)
             self.observations.append(dict(observation))
@@ -356,7 +360,20 @@ def main(argv=None):
         report.update(execute(api, plan, private, public))
         report["status"] = "COMPLETE"
     except Exception as exc:
-        report["error_code"] = getattr(exc, "code", str(exc) if isinstance(exc, ExperimentError) else type(exc).__name__)
+        report["error_code"] = exc.code if isinstance(exc, ExperimentError) else type(exc).__name__
+        if isinstance(exc, ExperimentError):
+            report["error_details"] = exc.details
+        else:
+            # Preserve a useful source location without publishing exception
+            # arguments, local paths, credentials, or a raw traceback.
+            frames = traceback.extract_tb(exc.__traceback__)
+            if frames:
+                frame = frames[-1]
+                report["error_location"] = {
+                    "file": Path(frame.filename).name,
+                    "function": frame.name,
+                    "line": frame.lineno,
+                }
     finally:
         report["bootstrap_mutations"] = len(api.mutations)
         write_json(public / "bootstrap-http.json", api.observations)
