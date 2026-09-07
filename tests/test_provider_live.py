@@ -86,6 +86,35 @@ class BootstrapTests(unittest.TestCase):
             with self.subTest(path=path):
                 with self.assertRaises(mod.ExperimentError):api.request(method,path,body)
         self.assertEqual(api.mutations,[])
+    def test_repository_root_get_is_allowed(self):
+        import io
+        api=mod.GitHubAPI('disposable-test-token')
+        class Response:
+            status=200
+            headers={}
+            def __enter__(self): return self
+            def __exit__(self,*args): return False
+            def read(self,n=-1): return b'{"id":1360489534}'
+        class Opener:
+            def open(self,request,timeout):
+                self.request=request
+                return Response()
+        opener=Opener()
+        api.opener=opener
+        self.assertEqual(api.repo(),{'id':1360489534})
+        self.assertEqual(opener.request.full_url,
+                         'https://api.github.com/repos/'+mod.SANDBOX)
+        self.assertEqual(len(api.observations),1)
+        self.assertEqual(api.mutations,[])
+
+    def test_empty_mutation_paths_still_fail_closed(self):
+        api=mod.GitHubAPI('disposable-test-token')
+        for method,body in [('POST',{}),('PUT',{})]:
+            with self.subTest(method=method):
+                with self.assertRaisesRegex(mod.ExperimentError,'PATH_INVALID'):
+                    api.request(method,'',body)
+        self.assertEqual(api.mutations,[])
+
     def test_confirmation_required_before_any_api(self):
         with self.assertRaisesRegex(mod.ExperimentError,'EXPLICIT_CONFIRMATION_REQUIRED'):
             mod.main(['--run-id','123','--output','/tmp/unused-a','--state','/tmp/unused-b',
