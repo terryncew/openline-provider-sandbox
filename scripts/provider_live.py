@@ -68,8 +68,9 @@ class GitHubAPI:
 
     def request(self, method, suffix, body=None):
         require(method in {"GET", "POST", "PUT"}, "METHOD_INVALID")
-        require(suffix.startswith("/") and ".." not in suffix and not suffix.startswith("//")
-                and "?" not in suffix and "#" not in suffix, "PATH_INVALID")
+        require((suffix == "" and method == "GET") or
+                (suffix.startswith("/") and ".." not in suffix and not suffix.startswith("//")
+                 and "?" not in suffix and "#" not in suffix), "PATH_INVALID")
         allowed = {
             ("GET", ""), ("GET", "/contents/SANDBOX.json"),
             ("POST", "/git/refs"), ("POST", "/pulls"),
