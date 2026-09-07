@@ -35,9 +35,15 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install the pinned Wallet implementation
-        run: python -m pip install ./wallet
+        run: python -m pip install "./wallet[mcp]"
+      - name: Verify exact Wallet source pin
+        run: test "$(git -C wallet rev-parse HEAD)" = "c35e7f427a26cddfc4e7d300a74b84aacc0ea64e"
+      - name: Test pinned Wallet downstream suite
+        run: python -m unittest discover -s wallet/tests -v
       - name: Verify the launcher before granting mutation authority
         run: python -m unittest discover -s tests -v
+      - name: Compile launcher before mutation
+        run: python -m compileall -q scripts tests
       - name: Run the real disposable GitHub experiment
         env:
           OPENLINE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

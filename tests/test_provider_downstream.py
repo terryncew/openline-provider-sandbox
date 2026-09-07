@@ -13,9 +13,12 @@ from unittest.mock import patch
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from openline_wallet.crypto import sign_record
 from openline_wallet.github_effect_live import run_experiment
-from test_github_effect import FakeGitHub, TARGET
-
 ROOT = Path(__file__).resolve().parents[1]
+FIXTURE_PATH = ROOT / "wallet/tests/test_github_effect.py"
+FIXTURE_SPEC = importlib.util.spec_from_file_location("wallet_provider_fixture", FIXTURE_PATH)
+FIXTURE = importlib.util.module_from_spec(FIXTURE_SPEC)
+FIXTURE_SPEC.loader.exec_module(FIXTURE)
+FakeGitHub, TARGET = FIXTURE.FakeGitHub, FIXTURE.TARGET
 SPEC = importlib.util.spec_from_file_location("sandbox_launcher", ROOT / "scripts/provider_live.py")
 mod = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(mod)
