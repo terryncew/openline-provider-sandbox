@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: python -m pip install ./wallet
+      - run: python -m pip install "./wallet[mcp]"
       - name: Verify exact Wallet source pin
         run: test "$(git -C wallet rev-parse HEAD)" = "c35e7f427a26cddfc4e7d300a74b84aacc0ea64e"
       - name: Test pinned Wallet downstream suite
