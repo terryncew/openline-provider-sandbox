@@ -1,0 +1,15 @@
+{
+  "experiment_id": "PROVIDER-EFFECT-LIVE-001",
+  "source_commit": "c35e7f427a26cddfc4e7d300a74b84aacc0ea64e",
+  "target_repository": "terryncew/openline-provider-sandbox",
+  "scope": "One disposable GitHub PR merge and a receiver-owned held acknowledgement",
+  "transport": "github",
+  "pre_dispatch_control": "A prepared ticket is revoked and closed before release; zero merge requests and no merged PR",
+  "in_flight_control": "One real merge request returns successfully; its acknowledgement is held while revocation is requested; closure waits for the receiver frontier and reconciles the exact resulting commit",
+  "success": "One merge request, zero pre-dispatch requests, signed effect and closure evidence, exact reviewed head as second merge parent, and a fresh GitHub read confirming the merged PR and commit",
+  "failure_verdict": "INCONCLUSIVE",
+  "no_retry": true,
+  "recovery": "Read-only reconciliation; never redispatch the original merge",
+  "exclusions": ["GitHub internal queue cancellation", "GitHub Actions closure", "other writers", "exact-base compare-and-swap", "production crash recovery", "universal revocation closure"],
+  "repeat_policy": "Preserve any failure or uncertainty. Do not rerun the same target to obtain a passing result."
+}
