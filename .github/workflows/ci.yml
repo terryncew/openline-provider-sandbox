@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: terryncew/openline-wallet
-          ref: c35e7f427a26cddfc4e7d300a74b84aacc0ea64e
+          ref: 323c11f55c9c6bcc6d618ce4c0f3f19cbbc627bd
           path: wallet
           persist-credentials: false
       - uses: actions/setup-python@v5
@@ -27,7 +27,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: python -m pip install "./wallet[mcp]"
       - name: Verify exact Wallet source pin
-        run: test "$(git -C wallet rev-parse HEAD)" = "c35e7f427a26cddfc4e7d300a74b84aacc0ea64e"
+        run: test "$(git -C wallet rev-parse HEAD)" = "323c11f55c9c6bcc6d618ce4c0f3f19cbbc627bd"
       - name: Test pinned Wallet downstream suite
         run: python -m unittest discover -s wallet/tests -v
       - name: Test complete local sandbox path
