@@ -1,0 +1,38 @@
+{
+  "confirmation": "RUN GITHUB ACK DIRECT CLOSURE",
+  "experiment_id": "GITHUB-ACK-CLOSURE-LIVE-003",
+  "forced_boundary": "After successful GitHub merge acknowledgement is durably recorded, force immediate _settled_merge to raise GITHUB_MERGE_NOT_RECONCILED exactly once in the initial receiver.",
+  "predecessor": {
+    "experiment_id": "GITHUB-ACK-CLOSURE-LIVE-002",
+    "live_run_id": 34729537944,
+    "verdict": "GITHUB_ACKNOWLEDGED_EFFECT_CLOSURE_UNRESOLVED"
+  },
+  "predecessor_observation": {
+    "failure_dependency": "late recovery still depended on PR merge_commit_sha convergence",
+    "provider_merge_observed": true,
+    "receiver_effect_closure_established": false
+  },
+  "provider_sandbox_base": "9a64a5762a808b97b7a1356e36763fd48249babd",
+  "recovery": {
+    "direct_acknowledged_commit_read_required": true,
+    "max_late_wait_seconds": 60,
+    "max_total_merge_requests": 1,
+    "mutation_retry_allowed": false,
+    "non_null_contradictory_pr_sha_fails_closed": true,
+    "pr_merge_commit_sha_required_for_pass": false,
+    "read_only_settlement": true,
+    "receiver_restart_required": true,
+    "required_active_frontiers": 0,
+    "required_closure_status": "EFFECT_CLOSED",
+    "required_effect_status": "MERGE_CONFIRMED"
+  },
+  "sandbox_repository": "terryncew/openline-provider-sandbox",
+  "schema": "openline.github-ack-closure-live-003.preregistration.v1",
+  "status": "PREREGISTERED",
+  "verdicts": {
+    "fail": "GITHUB_ACK_DIRECT_COMMIT_CLOSURE_FAILED",
+    "inconclusive": "GITHUB_ACK_DIRECT_COMMIT_CLOSURE_UNRESOLVED",
+    "pass": "GITHUB_ACK_DIRECT_COMMIT_CLOSURE_ENFORCED"
+  },
+  "wallet_commit": "4d26040c0f8e835184ebb710356c9601842610fe"
+}
