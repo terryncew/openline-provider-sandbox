@@ -1,0 +1,17 @@
+{
+  "admitted": {
+    "stopped": {
+      "head_ref": "exp/pgc001-stopped-a3",
+      "head_sha": "2e23fe68deee6b57660042c667faa8515ea90750",
+      "pr": 20,
+      "status": "ADMITTED"
+    }
+  },
+  "owner": "owner",
+  "stop_effective": {
+    "head_ref": "exp/pgc001-stopped-a3",
+    "pr": 20,
+    "sentinel_sha": "90fa61ff44e4f3ef84180a6bd8c215127f48ce71"
+  },
+  "stop_requested": true
+}

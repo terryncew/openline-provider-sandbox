@@ -1,0 +1,17 @@
+{
+  "admitted": {
+    "inflight": {
+      "head_ref": "exp/pgc001-inflight",
+      "head_sha": "88e1040533e1c62e5fdd11745a8a9087bc3735f3",
+      "pr": 21,
+      "status": "ADMITTED"
+    }
+  },
+  "owner": "owner",
+  "stop_effective": {
+    "head_ref": "exp/pgc001-inflight",
+    "pr": 21,
+    "sentinel_sha": "2a6e7cb2f6c3de1c72aea13e9dcbaa74803a15fe"
+  },
+  "stop_requested": true
+}
