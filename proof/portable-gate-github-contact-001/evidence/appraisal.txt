@@ -1,0 +1,7 @@
+APPRAISAL
+ - records=25 integrity=PER_RECORD_VALID links=NO_DANGLING forks=3_DOCUMENTED
+ - CONTROL: PR #17 merged=38b8f5540d7ee45cdd3b3101a3ee2675a9d9cc68 (independent) == 38b8f5540d7ee45cdd3b3101a3ee2675a9d9cc68 (evidence) -> CONTROL_EFFECT_OBSERVED
+ - STOPPED: PR #20 merged=false state=open (independent); refusal recorded post-STOP_EFFECTIVE (90fa61ff); provider probe 409 -> STOPPED_REFUSED_UNMERGED
+ - IN-FLIGHT: dispatch under admitted token 88e10405 (pre-STOP authority); PR #21 merged ab6aa3e4 before STOP_EFFECTIVE -> PRE_STOP_COMMIT (honest)
+ - no dispatch causally after a STOP for the same PR
+ - all effect claims reconciled against independent GitHub state
