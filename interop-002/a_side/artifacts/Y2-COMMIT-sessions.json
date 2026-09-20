@@ -1,0 +1,25 @@
+{
+  "consumed_nonces": {
+    "86dec4c525504aa128c12256c7c24841": {
+      "consumed_at": "2026-09-20T02:27:40.532657Z",
+      "decision_hash": "6190d43903a93b1eab97311f76b38524e033e55a329efe781e8b7e265998a65d",
+      "run_id": "run-interop-002",
+      "sequence": 1,
+      "session_id": "session-Y2",
+      "source_hash": "bf08429ea49c4a5fb5b1f43df20da6fc4e271497403a5d22afecc08f65a34662"
+    }
+  },
+  "schema": "openline.proof_to_policy.sessions.v0.2",
+  "sessions": {
+    "run-interop-002\u001fsession-Y2": {
+      "next_sequence": 2,
+      "parent_decision_hash": "6190d43903a93b1eab97311f76b38524e033e55a329efe781e8b7e265998a65d",
+      "pending": {},
+      "run_id": "run-interop-002",
+      "seen_source_hashes": [
+        "bf08429ea49c4a5fb5b1f43df20da6fc4e271497403a5d22afecc08f65a34662"
+      ],
+      "session_id": "session-Y2"
+    }
+  }
+}

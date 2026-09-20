@@ -1,0 +1,6 @@
+{
+  "b_signing_pubkey": "3039ba5c07f087918c8a687ebe78598f1b007212d72113916a92566a3f96bf6e",
+  "decision": "REFUSE",
+  "effect": null,
+  "reason": "REPLAY_CONSUMED"
+}

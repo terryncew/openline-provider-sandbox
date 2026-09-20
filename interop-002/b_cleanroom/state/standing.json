@@ -1,0 +1,26 @@
+{
+  "tool_call|interop-002-Y1": [
+    {
+      "decision": "COMMIT",
+      "payload_hash": "063ba5bb480eb03aa3696ce591b5dc096a74b1e8d95244338e0815350ee1950d",
+      "terminal": false,
+      "verdict": "VERIFIED"
+    }
+  ],
+  "tool_call|interop-002-Y2": [
+    {
+      "decision": "DENY",
+      "payload_hash": "d21faa395536fa196f1d511742e207696c4bb1324a2a3dcf4e3aa549118bef31",
+      "terminal": true,
+      "verdict": "REJECTED"
+    }
+  ],
+  "tool_call|interop-002-Y3": [
+    {
+      "decision": "COMMIT",
+      "payload_hash": "f9473ad1bb1ff45aa72974978ea00db8c7db635cd084a305e43c4ce19b3a739a",
+      "terminal": false,
+      "verdict": "VERIFIED"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "b_signing_pubkey": "3039ba5c07f087918c8a687ebe78598f1b007212d72113916a92566a3f96bf6e",
+  "decision": "COMMIT",
+  "effect": {
+    "commit": "67c6e5abadee42003f96c831615c86faa311c455",
+    "ref_after": "67c6e5abadee42003f96c831615c86faa311c455",
+    "ref_before": "10fd5f7df3791b6b172650d43b75021270e61cc5"
+  },
+  "reason": "ALL_CHECKS_PASS",
+  "trace_payload_hash": "878041389eb58b0931f3b522729562b72adde5cd59d458f76f1a738e322e76c2",
+  "trace_receipt_file": "I5-result-trace-receipt.json"
+}

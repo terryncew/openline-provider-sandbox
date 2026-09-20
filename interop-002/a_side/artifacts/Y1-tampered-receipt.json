@@ -1,0 +1,233 @@
+{
+  "action": {
+    "claim_hash": "5e300c2daef74f8d98e6a5efe57a0a80842352be2fca4032047d32eeae390160",
+    "id": "interop-002-Y1-tampered",
+    "risk_level": "medium",
+    "type": "tool_call"
+  },
+  "algorithm_id": "openline-proof-to-policy-gate-0.4",
+  "assessments": {
+    "coverage": {
+      "details": {
+        "claim": "declared chain from sequence 1 through terminal verified; action omission remains out of scope"
+      },
+      "reason_codes": [],
+      "status": "pass"
+    },
+    "evidence": {
+      "details": {
+        "artifact_hashes": {
+          "result": "cdf5890403837593424a849783175ef841e0102c2e2cc287afbdc94877e4d32a"
+        },
+        "bound_evidence_ids": [
+          "result"
+        ],
+        "raw_evidence_stored_in_decision": false,
+        "required_claim_ids": [
+          "interop-002-Y1"
+        ],
+        "required_evidence_ids": [
+          "result"
+        ],
+        "scope": "policy-declared evidence binding and predicates; no general truth inference"
+      },
+      "reason_codes": [],
+      "status": "pass"
+    },
+    "freshness": {
+      "details": {
+        "replay_guard": {
+          "details": {
+            "challenge_issued_at": "2026-09-20T02:27:40.262178Z"
+          },
+          "reason_codes": [],
+          "status": "pass"
+        },
+        "source_age_seconds": 0
+      },
+      "reason_codes": [],
+      "status": "pass"
+    },
+    "independence": {
+      "details": {
+        "required": false
+      },
+      "reason_codes": [],
+      "status": "pass"
+    },
+    "integrity": {
+      "details": {},
+      "reason_codes": [],
+      "status": "pass"
+    },
+    "outcome": {
+      "details": {
+        "evidence_hash": "cdf5890403837593424a849783175ef841e0102c2e2cc287afbdc94877e4d32a",
+        "harmful": false,
+        "independence": "receiver",
+        "rollback_supported": false,
+        "status": "pass",
+        "witness_id": "interop-002-receiver",
+        "witness_key": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6"
+      },
+      "reason_codes": [],
+      "status": "pass"
+    },
+    "profile": {
+      "details": {},
+      "reason_codes": [],
+      "status": "pass"
+    },
+    "provenance": {
+      "details": {
+        "controllers": [
+          "interop-002-source"
+        ],
+        "independence": [
+          "operator"
+        ]
+      },
+      "reason_codes": [],
+      "status": "pass"
+    },
+    "source_signal": {
+      "details": {
+        "required": false
+      },
+      "reason_codes": [],
+      "status": "pass"
+    },
+    "verified_commit": {
+      "details": {
+        "authorization": {
+          "action_hash": "64df1393f219ffba0e9c81203923671b75916490e05027c0bf3157a8a23aef29",
+          "authorization_hash": "9e7178e592183105d24513f09aa277e12287b8c690c4421dd376be1a6470d466",
+          "capsule_hash": "72eaee0cbd5e64c499cf9924fb5ee3631cf44cfe455b27f012ee1ca6310bcbbc",
+          "evidence_hashes": [
+            "cdf5890403837593424a849783175ef841e0102c2e2cc287afbdc94877e4d32a"
+          ],
+          "expires_at": "2026-09-20T02:31:40.260883Z",
+          "one_use_code_hash": "a8e1202cf0a8c3b7e89fcbabb4ed023d2e7edf4a7791dc90e089cbe992532452",
+          "policy_hash": "dd73adab77159b7a3bafbd9c0deb1953d798f071143011464fb3e8bce0e40d01",
+          "profile": "verified_commit/v1",
+          "run_id": "run-interop-002",
+          "settings_hash": "0a5a6b356212b1cd7a595a48da36f1b41ac1ad7c186c72a52aacfff2642506a4",
+          "target": "terryncew/openline-provider-sandbox:refs/heads/interop-002-effect",
+          "tool": "github.ref.advance"
+        },
+        "profile": "verified_commit/v1",
+        "raw_one_use_code_stored": false,
+        "raw_settings_stored": false,
+        "required": true
+      },
+      "reason_codes": [],
+      "status": "pass"
+    }
+  },
+  "binding": {
+    "challenge_nonce": "e7e08d1ac84e2b3b017dbde917cf98fe",
+    "expected_source_hash": "d4ab7ebfc1607fcb976c1595e62942a940f8e6a959afed2e46b5420afbd2f8ed",
+    "parent_decision_hash": null,
+    "run_id": "run-interop-002",
+    "sequence": 1,
+    "session_id": "session-Y1"
+  },
+  "canonicalization_id": "olp-canonical-json-int-v1",
+  "chain_accepted": true,
+  "commit_authorization": {
+    "action_hash": "64df1393f219ffba0e9c81203923671b75916490e05027c0bf3157a8a23aef29",
+    "authorization_hash": "9e7178e592183105d24513f09aa277e12287b8c690c4421dd376be1a6470d466",
+    "capsule_hash": "72eaee0cbd5e64c499cf9924fb5ee3631cf44cfe455b27f012ee1ca6310bcbbc",
+    "evidence_hashes": [
+      "cdf5890403837593424a849783175ef841e0102c2e2cc287afbdc94877e4d32a"
+    ],
+    "expires_at": "2026-09-20T02:31:40.260883Z",
+    "one_use_code_hash": "a8e1202cf0a8c3b7e89fcbabb4ed023d2e7edf4a7791dc90e089cbe992532452",
+    "policy_hash": "dd73adab77159b7a3bafbd9c0deb1953d798f071143011464fb3e8bce0e40d01",
+    "profile": "verified_commit/v1",
+    "run_id": "run-interop-002",
+    "settings_hash": "0a5a6b356212b1cd7a595a48da36f1b41ac1ad7c186c72a52aacfff2642506a4",
+    "target": "terryncew/openline-provider-sandbox:refs/heads/interop-002-effect",
+    "tool": "github.ref.advance"
+  },
+  "created_at": "2026-09-20T02:27:40.260883Z",
+  "decision": "COMMIT",
+  "issuer": {
+    "id": "interop-002-test-gate"
+  },
+  "kind": "proof_to_policy_decision_receipt",
+  "payload_hash": "063ba5bb480eb03aa3696ce591b5dc096a74b1e8d95244338e0815350ee1950d",
+  "policy": {
+    "hash": "dd73adab77159b7a3bafbd9c0deb1953d798f071143011464fb3e8bce0e40d01",
+    "id": "interop-002.receiver-policy",
+    "snapshot": {
+      "deny_risk_levels": [],
+      "evidence_assertions": [
+        {
+          "evidence_id": "result",
+          "op": "equals",
+          "path": "approved",
+          "value": true
+        }
+      ],
+      "max_evidence_bytes": 10000000,
+      "max_source_age_seconds": 300,
+      "metadata": {
+        "verified_commit": {
+          "capsule_hash": "72eaee0cbd5e64c499cf9924fb5ee3631cf44cfe455b27f012ee1ca6310bcbbc",
+          "evidence_hashes": [
+            "cdf5890403837593424a849783175ef841e0102c2e2cc287afbdc94877e4d32a"
+          ],
+          "max_ttl_seconds": 300,
+          "required": true,
+          "run_id": "run-interop-002",
+          "settings_hash": "0a5a6b356212b1cd7a595a48da36f1b41ac1ad7c186c72a52aacfff2642506a4",
+          "target": "terryncew/openline-provider-sandbox:refs/heads/interop-002-effect",
+          "tool": "github.ref.advance"
+        }
+      },
+      "no_badge_action_types": [
+        "eval_score_claim"
+      ],
+      "policy_id": "interop-002.receiver-policy",
+      "require_declared_coverage": true,
+      "require_evidence": true,
+      "require_independent_source": false,
+      "require_outcome_witness": true,
+      "require_replay_guard": true,
+      "require_source_bound_evidence": true,
+      "require_trusted_source": true,
+      "required_claim_ids": [],
+      "required_evidence_ids": [
+        "result"
+      ],
+      "rollback_on_harm": true,
+      "version": "1"
+    },
+    "version": "1"
+  },
+  "privacy": {
+    "raw_evidence_stored": false,
+    "raw_source_disclosure_stored": false
+  },
+  "reason_codes": [],
+  "receipt_version": "0.4",
+  "request_id": "request-interop-002-Y1",
+  "signature": {
+    "algorithm": "Ed25519",
+    "public_key": "9647b78a4f5423024f83de0c12fbe9ec5275e8d23a2fda83014d43cdf89fd176",
+    "value": "26fb4123a50a71563da271a1fe720a7c3a5935c37a5448e421bbb31b80dcf756525ab2419dd18503adbc87ce06712c05558152e8937d26a40ad53f3d8e27710d"
+  },
+  "source": {
+    "format": "agent_receipts",
+    "primary_hash": "d4ab7ebfc1607fcb976c1595e62942a940f8e6a959afed2e46b5420afbd2f8ed",
+    "receipt_hashes": [
+      "d4ab7ebfc1607fcb976c1595e62942a940f8e6a959afed2e46b5420afbd2f8ed"
+    ],
+    "source_key_ids": [
+      "did:example:interop-002-source#key-1"
+    ]
+  },
+  "spec_uri": "https://github.com/terryncew/openline-receipt-gate",
+  "verdict": "VERIFIED"
+}

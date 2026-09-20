@@ -1,0 +1,8 @@
+{
+  "b_signing_pubkey": "3039ba5c07f087918c8a687ebe78598f1b007212d72113916a92566a3f96bf6e",
+  "decision": "ADMIT",
+  "effect": null,
+  "reason": "ADMITTED_REVOCATION",
+  "trace_payload_hash": "22ef039d23519e72863fbeeca98eb41657734186d1380c42681f02814c51edfd",
+  "trace_receipt_file": "I3-deny-result-trace-receipt.json"
+}
