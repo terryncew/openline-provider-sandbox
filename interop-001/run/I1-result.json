@@ -1,0 +1,10 @@
+{
+  "decision": "COMMIT",
+  "effect": {
+    "commit": "8328b3ac35e4a15fa8b8209e6fc17af65a27388f",
+    "ref_after": "8328b3ac35e4a15fa8b8209e6fc17af65a27388f",
+    "ref_before": "df23caeeb36fdd1be3a4d9a4e0c297d9eac208d5"
+  },
+  "journal_seq": 1,
+  "reason": "ALL_CHECKS_PASS"
+}

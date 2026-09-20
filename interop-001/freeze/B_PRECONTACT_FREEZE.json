@@ -1,0 +1,14 @@
+{
+  "experiment": "INDEPENDENT-INTEROP-001",
+  "b_location": "b_cleanroom/",
+  "b_runtime": "~/.venvs/interop-b (python3.12 + cryptography only)",
+  "b_files": ["__init__.py", "canon.py", "check_vectors.py", "envelope.py", "provider.py", "receiver.py", "store.py"],
+  "qualification": {
+    "Q1_profile_sufficient_to_parse": "PASS 5/5 signed valid vectors: payload_hash reproduced + Ed25519 verified",
+    "Q2_negative_vectors": "PASS tampered receipt rejected (signature); altered disclosure rejected (hash mismatch); broken chain rejected (prev-hash discontinuity)",
+    "Q3_crypto_canon": "PASS A/B canonical commitments identical on frozen vectors (byte-identical payload_hash)",
+    "Q4_effect_path": "PASS scratch ref advanced exactly once via provider; failure path raises ProviderCallFailed",
+    "Q5_independence": "PASS no OpenLine imports/refs in code (comments name profile docs only); venv has cryptography+cffi+pycparser only; loaded modules stdlib+cryptography+b_cleanroom"
+  },
+  "note": "B frozen before any A-origin artifact contact. No profile edits after this point."
+}

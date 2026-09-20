@@ -1,0 +1,12 @@
+{
+  "b_private_key": "REDACTED (disposable experiment key; public key above suffices for verification)",
+  "b_public_key": "dfb5fa46bbb49f1e576c409cbe53c59188d68530ceecf41d40dd7276ca5f4b1d",
+  "covered_effect": {
+    "branch": "interop-001-effect",
+    "repo": "terryncew/openline-provider-sandbox",
+    "target": "terryncew/openline-provider-sandbox:refs/heads/interop-001-effect",
+    "tool": "github.ref.advance"
+  },
+  "pinned_issuer_key": "9647b78a4f5423024f83de0c12fbe9ec5275e8d23a2fda83014d43cdf89fd176",
+  "pinned_policy_hash": "0083e28c0f3a32b6251fecf51794415e4ef11837e08727aa7d0a8a706dbb668f"
+}
