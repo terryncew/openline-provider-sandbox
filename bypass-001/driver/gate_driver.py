@@ -259,14 +259,40 @@ class Driver:
         return owner_mandate_stop_check(self.view, SLOT_ID, now=self.now)
 
 
-def gh_api(*args: str) -> dict:
-    p = subprocess.run(
-        ["gh", "api", *args], capture_output=True, text=True, timeout=60
-    )
-    try:
-        return {"ok": p.returncode == 0, "stdout": p.stdout[:2000], "stderr": p.stderr[:500]}
-    except Exception as e:  # pragma: no cover
-        return {"ok": False, "error": str(e)}
+class ProviderCallFailed(RuntimeError):
+    """A provider mutation call failed or was unconfirmed.
+
+    Never swallowed: raising aborts execute_once, which journals
+    status='failed' and re-raises. BYPASS-001B R1.
+    """
+
+
+def gh_api(endpoint_segments, method: str = "GET", fields: dict | None = None) -> dict:
+    """Call the GitHub REST API.
+
+    endpoint_segments are joined into ONE path string (gh api requires a
+    single endpoint argument; passing segments separately silently
+    misroutes the call). Flags are passed with their values preserved.
+    Raises ProviderCallFailed on ANY non-zero exit: a failed provider call
+    can never return success. BYPASS-001B R1.
+    """
+    endpoint = "/".join(endpoint_segments)
+    cmd = ["gh", "api", endpoint, "-X", method]
+    for k, v in (fields or {}).items():
+        cmd += ["-f", f"{k}={v}"]
+    p = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+    body = None
+    if p.stdout.strip():
+        try:
+            body = json.loads(p.stdout)
+        except Exception:
+            body = None
+    if p.returncode != 0:
+        raise ProviderCallFailed(
+            f"gh api {method} {endpoint} failed rc={p.returncode}: "
+            f"{(p.stderr or p.stdout)[:500]}"
+        )
+    return {"body": body, "stdout": p.stdout[:2000]}
 
 
 def provider_ref_sha() -> str:
@@ -277,44 +303,91 @@ def provider_ref_sha() -> str:
     return p.stdout.split()[0] if p.stdout.strip() else "UNKNOWN"
 
 
-def cmd_q1(pr_number: int) -> dict:
+def cmd_q1(pr_number: int, case: str = "q1") -> dict:
     now = datetime.now(timezone.utc)
-    d = Driver("q1", now)
+    d = Driver(case, now)
     d.admit("ACTIVE", 1)
     receipt, action, code = d.issue(pr_number)
     ref_before = provider_ref_sha()
 
-    executed = {"ran": False}
+    executed = {"ran": False, "merge_sha": None}
 
     def receiver_executor():
+        # BYPASS-001B R2: every provider mutation must confirm, or raise.
+        # A failed/unconfirmed call can never return success.
         executed["ran"] = True
-        ap = gh_api("repos", REPO, "pulls", str(pr_number), "reviews", "-X", "POST", "-f", "event=APPROVE")
-        mg = gh_api("repos", REPO, "pulls", str(pr_number), "merge", "-X", "PUT", "-f", "merge_method=merge")
-        return {"approved": ap, "merged": mg}
+        gh_api(
+            ["repos", REPO, "pulls", str(pr_number), "reviews"],
+            method="POST",
+            fields={"event": "APPROVE"},
+        )
+        mg = gh_api(
+            ["repos", REPO, "pulls", str(pr_number), "merge"],
+            method="PUT",
+            fields={"merge_method": "merge"},
+        )
+        mbody = mg["body"] or {}
+        merge_sha = mbody.get("sha")
+        if mbody.get("merged") is not True or not merge_sha:
+            raise ProviderCallFailed(
+                f"merge not confirmed by provider: {str(mbody)[:500]}"
+            )
+        # Independent provider-side confirmation that the PR is merged.
+        pr = gh_api(["repos", REPO, "pulls", str(pr_number)], method="GET")
+        if (pr["body"] or {}).get("merged") is not True:
+            raise ProviderCallFailed(
+                f"PR #{pr_number} state not merged after merge call"
+            )
+        executed["merge_sha"] = merge_sha
+        return {"approved": True, "merged": True, "merge_commit_sha": merge_sha}
 
-    result = d.ledger.execute_once(
-        receipt,
-        action,
-        one_use_code=code,
-        trusted_gate_keys=[public_key_hex(d.gate_key)],
-        executor=receiver_executor,
-        now=now,
-        attempt_label="q1-mediated",
-        final_authority_check=d.check(),
-    )
+    failure = None
+    try:
+        result = d.ledger.execute_once(
+            receipt,
+            action,
+            one_use_code=code,
+            trusted_gate_keys=[public_key_hex(d.gate_key)],
+            executor=receiver_executor,
+            now=now,
+            attempt_label=f"{case}-mediated",
+            final_authority_check=d.check(),
+        )
+    except Exception as exc:  # execute_once journals status='failed', then re-raises
+        failure = f"{type(exc).__name__}: {exc}"
+        result = {"authorized": None, "execution_status": "failed"}
     ref_after = provider_ref_sha()
     journal = d.ledger.read_state()["attempts"]
+    merge_sha = executed["merge_sha"]
+    # effect_committed is true ONLY on provider confirmation AND independent
+    # observation attributing the ref advance to this exact merge:
+    # ref_after must equal the provider-returned merge SHA. BYPASS-001B R2.
+    provider_confirmed = bool(merge_sha)
+    attributed = (
+        provider_confirmed
+        and ref_after != "UNKNOWN"
+        and ref_after == merge_sha
+        and ref_before != ref_after
+    )
     evidence = {
+        "case": case,
         "authorized": result.get("authorized"),
         "execution_status": result.get("execution_status"),
         "executor_ran": executed["ran"],
+        "provider_merge_sha": merge_sha,
         "ref_before": ref_before,
         "ref_after": ref_after,
-        "effect_committed": ref_before != ref_after and ref_after != "UNKNOWN",
+        "effect_committed": attributed,
+        "attribution": "ref_after == provider merge SHA" if attributed else None,
+        "failure": failure,
         "final_check": journal[-1].get("standing_final_check_v1") if journal else None,
         "journal_tail": journal[-1] if journal else None,
     }
-    (EVIDENCE / "q1-mediated.json").write_text(json.dumps(evidence, indent=2, sort_keys=True, default=str))
+    (EVIDENCE / f"{case}-mediated.json").write_text(
+        json.dumps(evidence, indent=2, sort_keys=True, default=str)
+    )
+    if failure is not None:
+        raise RuntimeError(f"{case} executor failed: {failure}")
     return evidence
 
 
@@ -358,11 +431,13 @@ def cmd_stale(pr_number: int) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["q1", "stale"])
+    ap.add_argument("cmd", choices=["q1", "q1b", "stale"])
     ap.add_argument("--pr", type=int, required=True)
     args = ap.parse_args()
     EVIDENCE.mkdir(parents=True, exist_ok=True)
-    if args.cmd == "q1":
+    if args.cmd == "q1b":
+        out = cmd_q1(args.pr, case="q1b")
+    elif args.cmd == "q1":
         out = cmd_q1(args.pr)
     else:
         out = cmd_stale(args.pr)
