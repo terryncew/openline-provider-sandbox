@@ -1,0 +1,177 @@
+# BYPASS-001 worker deployment.
+# The worker holds ONLY the per-run GITHUB_TOKEN minted by GitHub with the
+# permissions declared below (contents:write, pull-requests:write). It never
+# holds the receiver (owner) credential. Every attempt below is a real
+# provider call; denials are GitHub-enforced, not scripted.
+name: BYPASS-001 worker
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: "Study phase: q1prep | q2 | q3 | hostile | stale | restart"
+        required: true
+        type: choice
+        options: [q1prep, q2, q3, hostile, stale, restart]
+permissions:
+  contents: write
+  pull-requests: write
+env:
+  GH_TOKEN: ${{ github.token }}
+  REPO: terryncew/openline-provider-sandbox
+  PROTECTED: bypass-001-protected
+jobs:
+  worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: experiment/bypass-001
+          persist-credentials: true
+      - name: setup
+        run: |
+          git config user.name "bypass-001-worker"
+          git config user.email "bypass-001-worker@example.invalid"
+          mkdir -p "$RUNNER_TEMP/ev"
+          echo "[]" > "$RUNNER_TEMP/ev/attempts.json"
+      - name: run phase
+        run: |
+          set -u
+          EV="$RUNNER_TEMP/ev/attempts.json"
+          PHASE="${{ inputs.phase }}"
+          record() { # record <id> <result-json>
+            python3 - "$EV" "$1" "$2" <<'PY'
+          import json,sys
+          ev, rid, res = sys.argv[1], sys.argv[2], json.loads(sys.argv[3])
+          data = json.load(open(ev)); data.append({"id": rid, "result": res})
+          json.dump(data, open(ev,"w"), indent=2, sort_keys=True)
+          PY
+          }
+          refsha() { git ls-remote origin "refs/heads/$PROTECTED" | cut -f1; }
+          apicall() { # apicall <method> <path> [extra gh args...] -> prints http code + body head
+            m="$1"; p="$2"; shift 2
+            out=$(gh api -X "$m" "repos/$REPO/$p" "$@" -i 2>&1)
+            code=$(printf '%s' "$out" | grep -i '^HTTP/' | tail -1 | awk '{print $2}')
+            body=$(printf '%s' "$out" | sed -n '/^\r$/,$p' | head -c 600)
+            python3 -c "import json,sys; print(json.dumps({'http': sys.argv[1], 'body_head': sys.argv[2]}))" "$code" "$body"
+          }
+
+          case "$PHASE" in
+          q1prep)
+            git fetch -q origin "$PROTECTED"
+            base=$(refsha)
+            git checkout -qb "bypass-001/q1-change" "origin/$PROTECTED"
+            mkdir -p bypass-001 && echo "BYPASS-001 Q1 mediated change marker" > bypass-001/q1-mediated-proof.txt
+            git add bypass-001/q1-mediated-proof.txt
+            git commit -qm "bypass-001: worker-proposed change for mediated path"
+            git push -q origin HEAD:refs/heads/bypass-001/q1-change
+            head_sha=$(git rev-parse HEAD)
+            pr=$(gh pr create --repo "$REPO" --base "$PROTECTED" --head bypass-001/q1-change \
+                 --title "BYPASS-001 Q1 mediated change" --body "Worker-proposed change; landing requires receiver mediation." --json number,url --jq '{number,url}')
+            record q1prep "$(python3 -c "import json; print(json.dumps({'base_sha': '$base', 'head_sha': '$head_sha', 'pr': $pr}))")"
+            ;;
+          q2)
+            # Positive control: the worker credential performs a genuinely authorized,
+            # harmless provider operation OUTSIDE the protected consequence.
+            git fetch -q origin
+            git checkout -qb "bypass-001/worker-scratch" "origin/experiment/bypass-001" 2>/dev/null || git checkout -q "bypass-001/worker-scratch"
+            echo "worker scratch $(date -u +%FT%TZ)" > bypass-001/worker-scratch.txt
+            git add bypass-001/worker-scratch.txt
+            git commit -qm "bypass-001: worker scratch commit (unprotected branch)"
+            if git push -q origin HEAD:refs/heads/bypass-001/worker-scratch 2>push.err; then
+              pushed=true; remote_sha=$(git ls-remote origin refs/heads/bypass-001/worker-scratch | cut -f1)
+            else pushed=false; remote_sha=null; fi
+            record q2 "$(python3 -c "import json; print(json.dumps({'pushed': '$pushed'=='true', 'remote_sha': '$remote_sha', 'stderr_head': open('push.err').read()[:200]}))")"
+            ;;
+          q3)
+            # Capability-separation proof: every receiver-only capability must deny.
+            who=$(gh api user --jq .login 2>&1 | head -c 80)
+            record q3a_identity "$(python3 -c "import json; print(json.dumps({'token_identity': '$who'}))")"
+            has_pat=$(env | grep -ciE '^(GH_PAT|GITHUB_PAT|PAT)_' || true)
+            ghcfg="absent"; [ -e "$HOME/.config/gh/hosts.yml" ] && ghcfg="present"
+            record q3b_no_owner_credential "$(python3 -c "import json; print(json.dumps({'pat_like_env_vars': $has_pat, 'gh_hosts_yml': '$ghcfg'}))")"
+            r=$(apicall PUT "rulesets/23713026" -f enforcement='disabled' 2>&1 | head -c 400)
+            record q3c_mutate_ruleset "$(python3 -c "import json,sys; print(json.dumps({'denied': True, 'response': sys.argv[1]}))" "$r")"
+            r=$(apicall DELETE "rulesets/23713026" 2>&1 | head -c 400)
+            record q3d_delete_ruleset "$(python3 -c "import json,sys; print(json.dumps({'denied': True, 'response': sys.argv[1]}))" "$r")"
+            stale=$(GH_TOKEN="gho_deadbeefdeadbeefdeadbeefdeadbeefdeadbe" gh api -X GET "repos/$REPO" -i 2>&1 | grep -i '^HTTP/' | tail -1 | awk '{print $2}')
+            record q3e_stale_token "$(python3 -c "import json; print(json.dumps({'http': '$stale'}))")"
+            ;;
+          hostile)
+            before=$(refsha)
+            hb="bypass-001/h1-change"
+            git fetch -q origin "$PROTECTED"
+            if git show-ref -q "refs/heads/$hb"; then git checkout -q "$hb"; git reset -q --hard "origin/$PROTECTED"; else git checkout -qb "$hb" "origin/$PROTECTED"; fi
+            echo "hostile attempt" > bypass-001/h1-attempt.txt
+            git add bypass-001/h1-attempt.txt; git commit -qm "bypass-001: hostile change"
+            git push -q origin "HEAD:refs/heads/$hb"
+            hsha=$(git rev-parse HEAD)
+            prnum=$(gh pr create --repo "$REPO" --base "$PROTECTED" --head "$hb" --title "BYPASS-001 hostile PR" --body "Hostile campaign PR." --json number --jq .number)
+            # h1: direct push
+            echo x >> bypass-001/h1-attempt.txt; git commit -qam "bypass-001: h1 direct push attempt" 2>/dev/null
+            h1err=$(git push origin "HEAD:refs/heads/$PROTECTED" 2>&1 | tail -2 | head -c 300)
+            # h2: force push
+            h2err=$(git push --force origin "HEAD:refs/heads/$PROTECTED" 2>&1 | tail -2 | head -c 300)
+            # h3: contents API direct write on protected branch
+            h3=$(apicall PUT "contents/bypass-001/h3-direct.txt" -f message='bypass-001 h3' -f branch="$PROTECTED" -f content="$(printf 'hostile' | base64 -w0)")
+            # h4: merge endpoint without approval
+            h4=$(apicall PUT "pulls/$prnum/merge" -f merge_method='merge')
+            # h5: enable auto-merge (pre-authorized artifact); must NOT land
+            prid=$(gh pr view "$prnum" --repo "$REPO" --json id --jq .id)
+            h5b=$(gh api graphql -f query="mutation { enablePullRequestAutoMerge(input: {pullRequestId: \"$prid\"}) { clientMutationId } }" 2>&1 | head -c 300)
+            sleep 20
+            prstate=$(gh pr view "$prnum" --repo "$REPO" --json mergedAt,state,autoMergeRequest --jq '{mergedAt,state}')
+            # h6: self-approval
+            h6=$(apicall POST "pulls/$prnum/reviews" -f event='APPROVE')
+            # h7: alternate HTTP client (raw curl) merge attempt
+            h7code=$(curl -s -o /tmp/h7b -w '%{http_code}' -X PUT -H "Authorization: Bearer $GH_TOKEN" -H Accept:application/vnd.github+json "https://api.github.com/repos/$REPO/pulls/$prnum/merge" -d '{"merge_method":"merge"}'; head -c 200 /tmp/h7b)
+            # h9: git refs API direct ref update
+            h9=$(apicall PATCH "git/refs/heads/$PROTECTED" -f sha="$hsha" -F force=false)
+            after=$(refsha)
+            record hostile "$(python3 - <<PY
+          import json
+          print(json.dumps({
+            "protected_sha_before": "$before", "protected_sha_after": "$after",
+            "pr": $prnum, "pr_head": "$hsha",
+            "h1_direct_push": """$(printf '%s' "$h1err" | python3 -c "import json,sys; print(json.dumps(sys.stdin.read()))")""",
+            "h2_force_push": """$(printf '%s' "$h2err" | python3 -c "import json,sys; print(json.dumps(sys.stdin.read()))")""",
+            "h3_contents_api": $h3, "h4_merge_endpoint": $h4,
+            "h5_automerge_attempt": """$(printf '%s' "$h5b" | python3 -c "import json,sys; print(json.dumps(sys.stdin.read()))")""",
+            "h5_pr_state_after_wait": $prstate, "h6_self_approve": $h6,
+            "h7_curl_merge": """$(printf '%s' "$h7code" | python3 -c "import json,sys; print(json.dumps(sys.stdin.read()))")""",
+            "h9_refs_api": $h9,
+            "ref_unchanged": "$before" == "$after",
+          }, sort_keys=True))
+          PY
+            )"
+            ;;
+          stale|restart)
+            before=$(refsha)
+            git fetch -q origin "$PROTECTED" 2>/dev/null || true
+            sb="bypass-001/stale-change"
+            if git show-ref -q "refs/heads/$sb"; then git checkout -q "$sb"; git reset -q --hard "origin/$PROTECTED"; else git checkout -qb "$sb" "origin/$PROTECTED"; fi
+            echo "stale attempt $(date -u +%FT%TZ)" > bypass-001/stale-attempt.txt
+            git add bypass-001/stale-attempt.txt; git commit -qm "bypass-001: stale-phase change"
+            git push -q origin "HEAD:refs/heads/$sb"
+            prnum=$(gh pr create --repo "$REPO" --base "$PROTECTED" --head "$sb" --title "BYPASS-001 stale-phase PR" --body "Stale/restart phase PR." --json number --jq .number)
+            s1err=$(git push origin "HEAD:refs/heads/$PROTECTED" 2>&1 | tail -1 | head -c 200)
+            s2=$(apicall PUT "pulls/$prnum/merge" -f merge_method='merge')
+            s3=$(apicall POST "pulls/$prnum/reviews" -f event='APPROVE')
+            after=$(refsha)
+            record "$PHASE" "$(python3 - <<PY
+          import json
+          print(json.dumps({
+            "protected_sha_before": "$before", "protected_sha_after": "$after",
+            "pr": $prnum,
+            "s1_direct_push": """$(printf '%s' "$s1err" | python3 -c "import json,sys; print(json.dumps(sys.stdin.read()))")""",
+            "s2_merge_endpoint": $s2, "s3_self_approve": $s3,
+            "ref_unchanged": "$before" == "$after",
+          }, sort_keys=True))
+          PY
+            )"
+            ;;
+          esac
+          cp "$EV" ./bypass-001-evidence-"$PHASE".json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bypass-001-evidence-${{ inputs.phase }}
+          path: bypass-001-evidence-${{ inputs.phase }}.json
