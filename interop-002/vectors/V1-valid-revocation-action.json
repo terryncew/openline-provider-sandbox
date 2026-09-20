@@ -1,0 +1,14 @@
+{
+  "capsule_hash": "72eaee0cbd5e64c499cf9924fb5ee3631cf44cfe455b27f012ee1ca6310bcbbc",
+  "evidence_hashes": [
+    "cdf5890403837593424a849783175ef841e0102c2e2cc287afbdc94877e4d32a"
+  ],
+  "policy_hash": "dd73adab77159b7a3bafbd9c0deb1953d798f071143011464fb3e8bce0e40d01",
+  "run_id": "run-interop-002",
+  "settings": {
+    "effect": "branch advance",
+    "ref": "refs/heads/interop-002-effect"
+  },
+  "target": "terryncew/openline-provider-sandbox:refs/heads/interop-002-effect",
+  "tool": "github.ref.advance"
+}
