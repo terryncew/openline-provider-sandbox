@@ -1,0 +1,129 @@
+{
+  "attribution": "ref_after == provider merge SHA",
+  "authorized": true,
+  "case": "q1b",
+  "effect_committed": true,
+  "execution_status": "completed",
+  "executor_ran": true,
+  "failure": null,
+  "final_check": {
+    "allowed": true,
+    "check_error": null,
+    "head_hash": "a7d33b906e9f281cc6f27fd1eeb4302c8987ef4d49dc5f63c694bc0770f7df0d",
+    "head_seq": 1,
+    "installed": true,
+    "reason_codes": [],
+    "record": {
+      "authorization": {
+        "authorization_id": "bypass/protected-branch:1",
+        "expires_at": "2026-09-20T02:30:02.437375Z",
+        "issued_at": "2026-09-20T01:30:02.437375Z",
+        "mandate_hash": "5405dcb1fa2e17a3ecade43ad435df1794a1921445393be001363a05e8ec6831",
+        "owner_id": "terryncew",
+        "payload_hash": "a7d33b906e9f281cc6f27fd1eeb4302c8987ef4d49dc5f63c694bc0770f7df0d",
+        "predecessor_hash": null,
+        "schema": "openline.mandate_owner_authorization.v1",
+        "sequence": 1,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "705fbac01f5519899f437bc42e40255ae9ab54bff00de3433af7d687d9e71ad5",
+          "value": "b78203f7a34b16b877c46839c5f03eeddf49a62ee23b2748919c0a6c359d0d8b38995ef152d56dbee6be08f1ac61ee2bf1f26967b5092b9ff94bb4bf3538ce09"
+        },
+        "slot_id": "bypass/protected-branch",
+        "state": "ACTIVE"
+      },
+      "mandate": {
+        "agent_id": "bypass-001-worker",
+        "allowed_action_types": [
+          "send"
+        ],
+        "allowed_disclosure_classes": [],
+        "allowed_targets": [
+          "github:terryncew/openline-provider-sandbox:refs/heads/bypass-001-protected"
+        ],
+        "delegation_allowed": false,
+        "expires_at": "2026-09-21T01:30:02.437375Z",
+        "forbidden_disclosure_classes": [],
+        "mandate_id": "bypass-001-mandate",
+        "max_payment_cents": 0,
+        "max_settlement_cents": 0,
+        "principal_id": "terryncew",
+        "profile": "principal_mandate/v1",
+        "purpose": "BYPASS-001: land one worker-proposed change on the protected branch only through receiver mediation",
+        "version": "v1"
+      }
+    },
+    "standing": "ACTIVE",
+    "terminal": false
+  },
+  "journal_tail": {
+    "attempt_action_hash": "058d9fe7fbda3495563332b81c1c40d2e604887cd57cc0fb42feb486fdbc8b7e",
+    "attempt_id": "182dff26fdd4397e3de81f14",
+    "attempt_label": "q1b-mediated",
+    "authorization_hash": "1bf6e11e3f7d8699634c54fd13c156993ced5ed1eae217e7b32f924ffd9ebb2d",
+    "checked_at": "2026-09-20T01:30:02.437375Z",
+    "commit_seq": 1,
+    "decision_payload_hash": "b162bd8b6f075939dac89834152c774ab69cf5dab723912861dd073cd416d361",
+    "execution_status": "completed",
+    "execution_updated_at": "2026-09-20T01:30:07.775761Z",
+    "path_verdict_v1": null,
+    "reason_codes": [],
+    "replay_scope_hash": null,
+    "result": "AUTHORIZED",
+    "standing_final_check_v1": {
+      "allowed": true,
+      "check_error": null,
+      "head_hash": "a7d33b906e9f281cc6f27fd1eeb4302c8987ef4d49dc5f63c694bc0770f7df0d",
+      "head_seq": 1,
+      "installed": true,
+      "reason_codes": [],
+      "record": {
+        "authorization": {
+          "authorization_id": "bypass/protected-branch:1",
+          "expires_at": "2026-09-20T02:30:02.437375Z",
+          "issued_at": "2026-09-20T01:30:02.437375Z",
+          "mandate_hash": "5405dcb1fa2e17a3ecade43ad435df1794a1921445393be001363a05e8ec6831",
+          "owner_id": "terryncew",
+          "payload_hash": "a7d33b906e9f281cc6f27fd1eeb4302c8987ef4d49dc5f63c694bc0770f7df0d",
+          "predecessor_hash": null,
+          "schema": "openline.mandate_owner_authorization.v1",
+          "sequence": 1,
+          "signature": {
+            "algorithm": "Ed25519",
+            "public_key": "705fbac01f5519899f437bc42e40255ae9ab54bff00de3433af7d687d9e71ad5",
+            "value": "b78203f7a34b16b877c46839c5f03eeddf49a62ee23b2748919c0a6c359d0d8b38995ef152d56dbee6be08f1ac61ee2bf1f26967b5092b9ff94bb4bf3538ce09"
+          },
+          "slot_id": "bypass/protected-branch",
+          "state": "ACTIVE"
+        },
+        "mandate": {
+          "agent_id": "bypass-001-worker",
+          "allowed_action_types": [
+            "send"
+          ],
+          "allowed_disclosure_classes": [],
+          "allowed_targets": [
+            "github:terryncew/openline-provider-sandbox:refs/heads/bypass-001-protected"
+          ],
+          "delegation_allowed": false,
+          "expires_at": "2026-09-21T01:30:02.437375Z",
+          "forbidden_disclosure_classes": [],
+          "mandate_id": "bypass-001-mandate",
+          "max_payment_cents": 0,
+          "max_settlement_cents": 0,
+          "principal_id": "terryncew",
+          "profile": "principal_mandate/v1",
+          "purpose": "BYPASS-001: land one worker-proposed change on the protected branch only through receiver mediation",
+          "version": "v1"
+        }
+      },
+      "standing": "ACTIVE",
+      "terminal": false
+    },
+    "stop_effective_seq": null,
+    "tool_result_hash": "757e47a60f6b1fa2842a7cbcf4291af5e0918b65a2e314819dc6b45ac860c8b1"
+  },
+  "provider_merge_sha": "407e26e0c46a76b7bc2368935c4de668ed0840c8",
+  "ref_after": "407e26e0c46a76b7bc2368935c4de668ed0840c8",
+  "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75"
+}

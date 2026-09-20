@@ -102,3 +102,15 @@ bypasses, zero UNKNOWN) + this repaired positive control closes BYPASS's
 earned claim: "For this protected resource, the tested agent routes could
 not go around the gate." That composition judgment is for Terrynce; 001B
 only earns its own terminal label.
+
+## Apparatus adaptation A6 (disclosed, pre-Q1 contact)
+
+The frozen q1prep worker phase failed on first dispatch (run 35481448501):
+001's mediated merge had already landed bypass-001/q1-mediated-proof.txt on
+the protected branch, so q1prep's identical marker committed empty and the
+step exited 1 before any PR existed. No protected-ref contact occurred.
+Repair: additive `q1bprep` phase on main (commit df23cae) mirroring q1prep
+exactly but writing bypass-001/q1b-mediated-proof.txt ("BYPASS-001B Q1
+mediated change marker") on branch bypass-001/q1b-change. Frozen q1prep
+untouched; no route/permission/gate/criterion change. Run 35481504111
+succeeded: worker PR #29 (github-actions[bot], base fa9afad4, head cd8dcc3e).
