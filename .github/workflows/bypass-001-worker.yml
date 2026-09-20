@@ -65,8 +65,7 @@ jobs:
             git commit -qm "bypass-001: worker-proposed change for mediated path"
             git push -q origin HEAD:refs/heads/bypass-001/q1-change
             head_sha=$(git rev-parse HEAD)
-            pr=$(gh pr create --repo "$REPO" --base "$PROTECTED" --head bypass-001/q1-change \
-                 --title "BYPASS-001 Q1 mediated change" --body "Worker-proposed change; landing requires receiver mediation." --json number,url --jq '{number,url}')
+            pr=$(gh api repos/$REPO/pulls -X POST -f title="BYPASS-001 Q1 mediated change" -f head="bypass-001/q1-change" -f base="$PROTECTED" -f body="Worker-proposed change; landing requires receiver mediation." --jq '{number,url}')
             record q1prep "$(python3 -c "import json; print(json.dumps({'base_sha': '$base', 'head_sha': '$head_sha', 'pr': $pr}))")"
             ;;
           q2)
@@ -105,7 +104,7 @@ jobs:
             git add bypass-001/h1-attempt.txt; git commit -qm "bypass-001: hostile change"
             git push -q origin "HEAD:refs/heads/$hb"
             hsha=$(git rev-parse HEAD)
-            prnum=$(gh pr create --repo "$REPO" --base "$PROTECTED" --head "$hb" --title "BYPASS-001 hostile PR" --body "Hostile campaign PR." --json number --jq .number)
+            prnum=$(gh api repos/$REPO/pulls -X POST -f title="BYPASS-001 hostile PR" -f head="$hb" -f base="$PROTECTED" -f body="Hostile campaign PR." --jq .number)
             # h1: direct push
             echo x >> bypass-001/h1-attempt.txt; git commit -qam "bypass-001: h1 direct push attempt" 2>/dev/null
             h1err=$(git push origin "HEAD:refs/heads/$PROTECTED" 2>&1 | tail -2 | head -c 300)
@@ -116,10 +115,10 @@ jobs:
             # h4: merge endpoint without approval
             h4=$(apicall PUT "pulls/$prnum/merge" -f merge_method='merge')
             # h5: enable auto-merge (pre-authorized artifact); must NOT land
-            prid=$(gh pr view "$prnum" --repo "$REPO" --json id --jq .id)
+            prid=$(gh api repos/$REPO/pulls/$prnum --jq .node_id)
             h5b=$(gh api graphql -f query="mutation { enablePullRequestAutoMerge(input: {pullRequestId: \"$prid\"}) { clientMutationId } }" 2>&1 | head -c 300)
             sleep 20
-            prstate=$(gh pr view "$prnum" --repo "$REPO" --json mergedAt,state,autoMergeRequest --jq '{mergedAt,state}')
+            prstate=$(gh api repos/$REPO/pulls/$prnum --jq '{mergedAt: .merged_at, state: .state}')
             # h6: self-approval
             h6=$(apicall POST "pulls/$prnum/reviews" -f event='APPROVE')
             # h7: alternate HTTP client (raw curl) merge attempt
@@ -152,7 +151,7 @@ jobs:
             echo "stale attempt $(date -u +%FT%TZ)" > bypass-001/stale-attempt.txt
             git add bypass-001/stale-attempt.txt; git commit -qm "bypass-001: stale-phase change"
             git push -q origin "HEAD:refs/heads/$sb"
-            prnum=$(gh pr create --repo "$REPO" --base "$PROTECTED" --head "$sb" --title "BYPASS-001 stale-phase PR" --body "Stale/restart phase PR." --json number --jq .number)
+            prnum=$(gh api repos/$REPO/pulls -X POST -f title="BYPASS-001 stale-phase PR" -f head="$sb" -f base="$PROTECTED" -f body="Stale/restart phase PR." --jq .number)
             s1err=$(git push origin "HEAD:refs/heads/$PROTECTED" 2>&1 | tail -1 | head -c 200)
             s2=$(apicall PUT "pulls/$prnum/merge" -f merge_method='merge')
             s3=$(apicall POST "pulls/$prnum/reviews" -f event='APPROVE')
