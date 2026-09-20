@@ -1,0 +1,13 @@
+{
+  "covered_effect": {
+    "target": "terryncew/openline-provider-sandbox:refs/heads/interop-001-effect",
+    "tool": "github.ref.advance"
+  },
+  "effect_record": {
+    "action_identity": "tool_call|interop-001-X3",
+    "decision_seq": 8,
+    "one_use_code_hash": "a85d8d4ee6d18b7ff23b9fc2d862022e78670fd2db43bbd9c6ef2231db41498a",
+    "receipt_hash": "c3be964773f59580c04f049ca30867aad003f8da9c981faf779a3b985b9c62a9"
+  },
+  "receiver": "independent-interop-001-b"
+}
