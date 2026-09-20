@@ -8,10 +8,10 @@ on:
   workflow_dispatch:
     inputs:
       phase:
-        description: "Study phase: q1prep | q2 | q3 | hostile | stale | restart"
+        description: "Study phase: q1prep | q1bprep | q2 | q3 | hostile | stale | restart"
         required: true
         type: choice
-        options: [q1prep, q2, q3, hostile, stale, restart]
+        options: [q1prep, q1bprep, q2, q3, hostile, stale, restart]
 permissions:
   contents: write
   pull-requests: write
@@ -68,6 +68,24 @@ jobs:
             head_sha=$(git rev-parse HEAD)
             pr=$(gh api repos/$REPO/pulls -X POST -f title="BYPASS-001 Q1 mediated change" -f head="bypass-001/q1-change" -f base="$PROTECTED" -f body="Worker-proposed change; landing requires receiver mediation." --jq '{number,url}')
             record q1prep "$(python3 -c "import json; print(json.dumps({'base_sha': '$base', 'head_sha': '$head_sha', 'pr': $pr}))")"
+            ;;
+          q1bprep)
+            # BYPASS-001B apparatus adaptation (A6, disclosed): the 001 Q1
+            # merge landed bypass-001/q1-mediated-proof.txt on the protected
+            # branch, so the frozen q1prep marker now commits empty. q1bprep
+            # mirrors q1prep exactly but writes a distinct 001B marker file,
+            # keeping the worker change non-empty. Frozen q1prep untouched.
+            git fetch -q origin "$PROTECTED"
+            base=$(refsha)
+            git push -q origin --delete refs/heads/bypass-001/q1b-change 2>/dev/null || true
+            git checkout -qb "bypass-001/q1b-change" "origin/$PROTECTED"
+            mkdir -p bypass-001 && echo "BYPASS-001B Q1 mediated change marker" > bypass-001/q1b-mediated-proof.txt
+            git add bypass-001/q1b-mediated-proof.txt
+            git commit -qm "bypass-001b: worker-proposed change for mediated path"
+            git push -q origin HEAD:refs/heads/bypass-001/q1b-change
+            head_sha=$(git rev-parse HEAD)
+            pr=$(gh api repos/$REPO/pulls -X POST -f title="BYPASS-001B Q1 mediated change" -f head="bypass-001/q1b-change" -f base="$PROTECTED" -f body="Worker-proposed change; landing requires receiver mediation." --jq '{number,url}')
+            record q1bprep "$(python3 -c "import json; print(json.dumps({'base_sha': '$base', 'head_sha': '$head_sha', 'pr': $pr}))")"
             ;;
           q2)
             # Positive control: the worker credential performs a genuinely authorized,
