@@ -208,7 +208,9 @@ semantics.
 
 - Branch: study/independent-interop-002
   (terryncew/openline-provider-sandbox)
-- Commit: <terminal freeze commit>
+- Evidence freeze commit: b0fe16a3575c8525a41ae348c036860f8634ec9f
+  (complete terminal record; this commit records that SHA, so the branch
+  tip is its child — exact tip SHA is stated in the experiment return)
 - PR: none. NOT MERGED (no merge conditions carried by the work order).
 - Effect branch: terryncew/openline-provider-sandbox
   refs/heads/interop-002-effect (2 B commits; disposable)
