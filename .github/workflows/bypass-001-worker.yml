@@ -128,21 +128,23 @@ jobs:
             # h9: git refs API direct ref update
             h9=$(apicall PATCH "git/refs/heads/$PROTECTED" -f sha="$hsha" -F force=false)
             after=$(refsha)
-            record hostile "$(BEFORE="$before" AFTER="$after" PRNUM="$prnum" HSHA="$hsha" H1ERR="$h1err" H2ERR="$h2err" H3="$h3" H4="$h4" H5B="$h5b" PRSTATE="$prstate" H6="$h6" H7CODE="$h7code" H9="$h9" python3 - <<'PY'
-          import json, os
-          e = os.environ
-          print(json.dumps({
-          "protected_sha_before": e["BEFORE"], "protected_sha_after": e["AFTER"],
-          "pr": int(e["PRNUM"]), "pr_head": e["HSHA"],
-          "h1_direct_push": e["H1ERR"], "h2_force_push": e["H2ERR"],
-          "h3_contents_api": json.loads(e["H3"]), "h4_merge_endpoint": json.loads(e["H4"]),
-          "h5_automerge_attempt": e["H5B"],
-          "h5_pr_state_after_wait": json.loads(e["PRSTATE"]), "h6_self_approve": json.loads(e["H6"]),
-          "h7_curl_merge": e["H7CODE"],
-          "h9_refs_api": json.loads(e["H9"]),
-          "ref_unchanged": e["BEFORE"] == e["AFTER"],
-          }, sort_keys=True))
-          PY
+            record hostile "$(BEFORE="$before" AFTER="$after" PRNUM="$prnum" HSHA="$hsha" \
+              H1ERR="$h1err" H2ERR="$h2err" H3="$h3" H4="$h4" H5B="$h5b" PRSTATE="$prstate" \
+              H6="$h6" H7CODE="$h7code" H9="$h9" python3 - <<'PY'
+import json, os
+e = os.environ
+print(json.dumps({
+  "protected_sha_before": e["BEFORE"], "protected_sha_after": e["AFTER"],
+  "pr": int(e["PRNUM"]), "pr_head": e["HSHA"],
+  "h1_direct_push": e["H1ERR"], "h2_force_push": e["H2ERR"],
+  "h3_contents_api": json.loads(e["H3"]), "h4_merge_endpoint": json.loads(e["H4"]),
+  "h5_automerge_attempt": e["H5B"],
+  "h5_pr_state_after_wait": json.loads(e["PRSTATE"]), "h6_self_approve": json.loads(e["H6"]),
+  "h7_curl_merge": e["H7CODE"],
+  "h9_refs_api": json.loads(e["H9"]),
+  "ref_unchanged": e["BEFORE"] == e["AFTER"],
+}, sort_keys=True))
+PY
             )"
             ;;
           stale|restart)
@@ -160,16 +162,16 @@ jobs:
             s3=$(apicall POST "pulls/$prnum/reviews" -f event='APPROVE')
             after=$(refsha)
             record "$PHASE" "$(BEFORE="$before" AFTER="$after" PRNUM="$prnum" S1ERR="$s1err" S2="$s2" S3="$s3" python3 - <<'PY'
-          import json, os
-          e = os.environ
-          print(json.dumps({
-          "protected_sha_before": e["BEFORE"], "protected_sha_after": e["AFTER"],
-          "pr": int(e["PRNUM"]),
-          "s1_direct_push": e["S1ERR"],
-          "s2_merge_endpoint": json.loads(e["S2"]), "s3_self_approve": json.loads(e["S3"]),
-          "ref_unchanged": e["BEFORE"] == e["AFTER"],
-          }, sort_keys=True))
-          PY
+import json, os
+e = os.environ
+print(json.dumps({
+  "protected_sha_before": e["BEFORE"], "protected_sha_after": e["AFTER"],
+  "pr": int(e["PRNUM"]),
+  "s1_direct_push": e["S1ERR"],
+  "s2_merge_endpoint": json.loads(e["S2"]), "s3_self_approve": json.loads(e["S3"]),
+  "ref_unchanged": e["BEFORE"] == e["AFTER"],
+}, sort_keys=True))
+PY
             )"
             ;;
           esac
