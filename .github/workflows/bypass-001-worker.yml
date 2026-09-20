@@ -59,7 +59,6 @@ jobs:
           q1prep)
             git fetch -q origin "$PROTECTED"
             base=$(refsha)
-            git push -q origin --delete refs/heads/bypass-001/q1-change 2>/dev/null || true
             git checkout -qb "bypass-001/q1-change" "origin/$PROTECTED"
             mkdir -p bypass-001 && echo "BYPASS-001 Q1 mediated change marker" > bypass-001/q1-mediated-proof.txt
             git add bypass-001/q1-mediated-proof.txt
@@ -100,7 +99,6 @@ jobs:
             before=$(refsha)
             hb="bypass-001/h1-change"
             git fetch -q origin "$PROTECTED"
-            git push -q origin --delete "refs/heads/$hb" 2>/dev/null || true
             if git show-ref -q "refs/heads/$hb"; then git checkout -q "$hb"; git reset -q --hard "origin/$PROTECTED"; else git checkout -qb "$hb" "origin/$PROTECTED"; fi
             echo "hostile attempt" > bypass-001/h1-attempt.txt
             git add bypass-001/h1-attempt.txt; git commit -qm "bypass-001: hostile change"
