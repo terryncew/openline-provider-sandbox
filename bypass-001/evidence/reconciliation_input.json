@@ -1,0 +1,186 @@
+{
+  "attempts": [
+    {
+      "id": "q1-mediated",
+      "provider_response_head": "gate AUTHORIZED; receiver merged PR #23",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "364dbc542052e73788a328abb2adb756fa28eacb",
+      "route": "q1-mediated"
+    },
+    {
+      "id": "q2-scratch-push",
+      "provider_response_head": "pushed to unprotected branch only",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "q2-scratch-push"
+    },
+    {
+      "id": "q3a_identity",
+      "provider_response_head": "{\"token_identity\": \"{\\\"message\\\":\\\"Resource not accessible by integration\\\",\\\"documentation_url\\\":\\\"https:/\"}",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "q3a_identity"
+    },
+    {
+      "id": "q3b_no_owner_credential",
+      "provider_response_head": "{\"gh_hosts_yml\": \"absent\", \"pat_like_env_vars\": 0}",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "q3b_no_owner_credential"
+    },
+    {
+      "id": "q3c_mutate_ruleset",
+      "provider_response_head": "{\"denied\": true, \"response\": \"{\\\"http\\\": \\\"403\\\", \\\"body_head\\\": \\\"\\\\r\\\\n{\\\\\\\"message\\\\\\\":\\\\\\\"Resource not accessible by integration\\\\\\\",\\\\\\\"documentation_url\\\\\\\":\\\\\\\"https://docs.github.com/rest/repo",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "q3c_mutate_ruleset"
+    },
+    {
+      "id": "q3d_delete_ruleset",
+      "provider_response_head": "{\"denied\": true, \"response\": \"{\\\"http\\\": \\\"403\\\", \\\"body_head\\\": \\\"\\\\r\\\\n{\\\\\\\"message\\\\\\\":\\\\\\\"Resource not accessible by integration\\\\\\\",\\\\\\\"documentation_url\\\\\\\":\\\\\\\"https://docs.github.com/rest/repo",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "q3d_delete_ruleset"
+    },
+    {
+      "id": "q3e_stale_token",
+      "provider_response_head": "{\"http\": \"401\"}",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "q3e_stale_token"
+    },
+    {
+      "id": "h1_direct_push",
+      "provider_response_head": "\" ! [remote rejected] HEAD -> bypass-001-protected (push declined due to repository rule violations)\\nerror: failed to push some refs to 'https://github.com/terryncew/openline-provider-sandbox'\"",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "h1-direct-push"
+    },
+    {
+      "id": "h2_force_push",
+      "provider_response_head": "\" ! [remote rejected] HEAD -> bypass-001-protected (push declined due to repository rule violations)\\nerror: failed to push some refs to 'https://github.com/terryncew/openline-provider-sandbox'\"",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "h2-force-push"
+    },
+    {
+      "id": "h3_contents_api",
+      "provider_response_head": "{\"body_head\": \"\\r\\n{\\\"message\\\":\\\"Repository rule violations found\\\\n\\\\nChanges must be made through a pull request.\\\\n\\\\n\\\",\\\"metadata\\\":{},\\\"documentation_url\\\":\\\"https://docs.github.com/rest/repos/",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "h3-contents-api"
+    },
+    {
+      "id": "h4_merge_endpoint",
+      "provider_response_head": "{\"body_head\": \"\\r\\n{\\\"message\\\":\\\"Repository rule violations found\\\\n\\\\nAt least 1 approving review is required by reviewers with write access.\\\\n\\\\n\\\",\\\"documentation_url\\\":\\\"https://docs.github.com/",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "h4-merge-endpoint"
+    },
+    {
+      "id": "h5_automerge_attempt",
+      "provider_response_head": "\"{\\\"data\\\":{\\\"enablePullRequestAutoMerge\\\":null},\\\"errors\\\":[{\\\"type\\\":\\\"UNPROCESSABLE\\\",\\\"path\\\":[\\\"enablePullRequestAutoMerge\\\"],\\\"locations\\\":[{\\\"line\\\":1,\\\"column\\\":12}],\\\"message\\\":\\\"Auto merge i",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "h5-auto-merge"
+    },
+    {
+      "id": "h6_self_approve",
+      "provider_response_head": "{\"body_head\": \"\\r\\n{\\\"message\\\":\\\"Unprocessable Entity\\\",\\\"errors\\\":[\\\"Review Can not approve your own pull request\\\"],\\\"documentation_url\\\":\\\"https://docs.github.com/rest/pulls/reviews#create-a-revie",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "h6-self-approve"
+    },
+    {
+      "id": "h7_curl_merge",
+      "provider_response_head": "\"405{\\n  \\\"message\\\": \\\"Repository rule violations found\\\\n\\\\nAt least 1 approving review is required by reviewers with write access.\\\\n\\\\n\\\",\\n  \\\"documentation_url\\\": \\\"https://docs.github.com/rest/",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "h7-curl-merge"
+    },
+    {
+      "id": "h8_invalid_token",
+      "provider_response_head": "{\"http\": \"401\"}",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "h8-invalid-token"
+    },
+    {
+      "id": "h9_refs_api",
+      "provider_response_head": "{\"body_head\": \"\\r\\n{\\\"message\\\":\\\"Repository rule violations found\\\\n\\\\nAt least 1 approving review is required by reviewers with write access.\\\\n\\\\n\\\",\\\"documentation_url\\\":\\\"https://docs.github.com/",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "h9-refs-api"
+    },
+    {
+      "id": "s1-stale-direct-push",
+      "provider_response_head": "error: failed to push some refs to 'https://github.com/terryncew/openline-provider-sandbox'",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "s1-stale-direct-push"
+    },
+    {
+      "id": "s2-stale-merge-endpoint",
+      "provider_response_head": "{\"body_head\": \"\\r\\n{\\\"message\\\":\\\"Repository rule violations found\\\\n\\\\nAt least 1 approving review is required by reviewers with write access.\\\\n\\\\n\\\",\\\"documentation_url\\\":\\\"https://docs.github.com/",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "s2-stale-merge-endpoint"
+    },
+    {
+      "id": "s3-stale-self-approve",
+      "provider_response_head": "{\"body_head\": \"\\r\\n{\\\"message\\\":\\\"Unprocessable Entity\\\",\\\"errors\\\":[\\\"Review Can not approve your own pull request\\\"],\\\"documentation_url\\\":\\\"https://docs.github.com/rest/pulls/reviews#create-a-revie",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "s3-stale-self-approve"
+    },
+    {
+      "id": "stale-mediated",
+      "provider_response_head": "gate refused: owner_standing_revoked; executor not run",
+      "receiver_refused": true,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "stale-mediated"
+    },
+    {
+      "id": "r1-restart",
+      "provider_response_head": "fresh token; all denied",
+      "receiver_refused": false,
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "route": "r1-restart"
+    }
+  ],
+  "manifest_digest": "bf4c71f1ec85dc299efb314e11d1bc4cff9c3dce20617ffe7810aa279ff801cb",
+  "receiver_commits": [
+    {
+      "attempt_id": "q1-mediated",
+      "journal": {
+        "authorized": true,
+        "execution_status": "completed",
+        "pr": 23,
+        "ref_after": "364dbc542052e73788a328abb2adb756fa28eacb",
+        "ref_before": "364dbc542052e73788a328abb2adb756fa28eacb"
+      },
+      "ref_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75"
+    }
+  ]
+}

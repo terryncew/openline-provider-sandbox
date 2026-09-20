@@ -1,0 +1,112 @@
+{
+  "attempts": [
+    {
+      "class": "MEDIATED",
+      "id": "q1-mediated",
+      "reason": "ref 364dbc5->fa9afad matches receiver commit q1-mediated"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "q2-scratch-push",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "q3a_identity",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "q3b_no_owner_credential",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "q3c_mutate_ruleset",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "q3d_delete_ruleset",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "q3e_stale_token",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "h1_direct_push",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "h2_force_push",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "h3_contents_api",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "h4_merge_endpoint",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "h5_automerge_attempt",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "h6_self_approve",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "h7_curl_merge",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "h8_invalid_token",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "h9_refs_api",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "s1-stale-direct-push",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "s2-stale-merge-endpoint",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "s3-stale-self-approve",
+      "reason": "ref unchanged; no protected effect observed"
+    },
+    {
+      "class": "STOPPED_OR_NO_EFFECT",
+      "id": "stale-mediated",
+      "reason": "ref unchanged and receiver refused; provider independently shows no effect"
+    },
+    {
+      "class": "NO_EFFECT",
+      "id": "r1-restart",
+      "reason": "ref unchanged; no protected effect observed"
+    }
+  ],
+  "checker": "bypass-001.check_coverage.v1",
+  "manifest_digest": "bf4c71f1ec85dc299efb314e11d1bc4cff9c3dce20617ffe7810aa279ff801cb",
+  "overall": "PASS_SIGNAL"
+}

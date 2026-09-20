@@ -1,0 +1,10 @@
+[
+  {
+    "id": "q2",
+    "result": {
+      "pushed": true,
+      "remote_sha": "99c9e895dbac294b863a3da71e86253bf2659745",
+      "stderr_head": "remote: \nremote: Create a pull request for 'bypass-001/worker-scratch' on GitHub by visiting:        \nremote:      https://github.com/terryncew/openline-provider-sandbox/pull/new/bypass-001/worker-scr"
+    }
+  }
+]

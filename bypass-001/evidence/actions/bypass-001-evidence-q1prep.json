@@ -1,0 +1,13 @@
+[
+  {
+    "id": "q1prep",
+    "result": {
+      "base_sha": "364dbc542052e73788a328abb2adb756fa28eacb",
+      "head_sha": "0b284490d82aedea8fadd7044ee25c546017b6c4",
+      "pr": {
+        "number": 23,
+        "url": "https://api.github.com/repos/terryncew/openline-provider-sandbox/pulls/23"
+      }
+    }
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "id": "q3a_identity",
+    "result": {
+      "token_identity": "{\"message\":\"Resource not accessible by integration\",\"documentation_url\":\"https:/"
+    }
+  },
+  {
+    "id": "q3b_no_owner_credential",
+    "result": {
+      "gh_hosts_yml": "absent",
+      "pat_like_env_vars": 0
+    }
+  },
+  {
+    "id": "q3c_mutate_ruleset",
+    "result": {
+      "denied": true,
+      "response": "{\"http\": \"403\", \"body_head\": \"\\r\\n{\\\"message\\\":\\\"Resource not accessible by integration\\\",\\\"documentation_url\\\":\\\"https://docs.github.com/rest/repos/rules#update-a-repository-ruleset\\\",\\\"status\\\":\\\"403\\\"}gh: Resource not accessible by integration (HTTP 403)\"}"
+    }
+  },
+  {
+    "id": "q3d_delete_ruleset",
+    "result": {
+      "denied": true,
+      "response": "{\"http\": \"403\", \"body_head\": \"\\r\\n{\\\"message\\\":\\\"Resource not accessible by integration\\\",\\\"documentation_url\\\":\\\"https://docs.github.com/rest/repos/rules#delete-a-repository-ruleset\\\",\\\"status\\\":\\\"403\\\"}gh: Resource not accessible by integration (HTTP 403)\"}"
+    }
+  },
+  {
+    "id": "q3e_stale_token",
+    "result": {
+      "http": "401"
+    }
+  }
+]

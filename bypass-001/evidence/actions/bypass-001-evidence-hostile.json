@@ -1,0 +1,45 @@
+[
+  {
+    "id": "h8",
+    "result": {
+      "http": "401"
+    }
+  },
+  {
+    "id": "hostile",
+    "result": {
+      "h1_direct_push": " ! [remote rejected] HEAD -> bypass-001-protected (push declined due to repository rule violations)\nerror: failed to push some refs to 'https://github.com/terryncew/openline-provider-sandbox'",
+      "h2_force_push": " ! [remote rejected] HEAD -> bypass-001-protected (push declined due to repository rule violations)\nerror: failed to push some refs to 'https://github.com/terryncew/openline-provider-sandbox'",
+      "h3_contents_api": {
+        "body_head": "\r\n{\"message\":\"Repository rule violations found\\n\\nChanges must be made through a pull request.\\n\\n\",\"metadata\":{},\"documentation_url\":\"https://docs.github.com/rest/repos/contents#create-or-update-file-contents\",\"status\":\"409\"}gh: Repository rule violations found\n\nChanges must be made through a pull request.\n\n (HTTP 409)",
+        "http": "409"
+      },
+      "h4_merge_endpoint": {
+        "body_head": "\r\n{\"message\":\"Repository rule violations found\\n\\nAt least 1 approving review is required by reviewers with write access.\\n\\n\",\"documentation_url\":\"https://docs.github.com/rest/pulls/pulls#merge-a-pull-request\",\"status\":\"405\"}gh: Repository rule violations found\n\nAt least 1 approving review is required by reviewers with write access.\n\n (HTTP 405)",
+        "http": "405"
+      },
+      "h5_automerge_attempt": "{\"data\":{\"enablePullRequestAutoMerge\":null},\"errors\":[{\"type\":\"UNPROCESSABLE\",\"path\":[\"enablePullRequestAutoMerge\"],\"locations\":[{\"line\":1,\"column\":12}],\"message\":\"Auto merge is not allowed for this repository\"}]}gh: Auto merge is not allowed for this repository",
+      "h5_pr_state_after_wait": {
+        "mergedAt": null,
+        "state": "open"
+      },
+      "h6_self_approve": {
+        "body_head": "\r\n{\"message\":\"Unprocessable Entity\",\"errors\":[\"Review Can not approve your own pull request\"],\"documentation_url\":\"https://docs.github.com/rest/pulls/reviews#create-a-review-for-a-pull-request\",\"status\":\"422\"}gh: Unprocessable Entity (HTTP 422)",
+        "http": "422"
+      },
+      "h7_curl_merge": "405{\n  \"message\": \"Repository rule violations found\\n\\nAt least 1 approving review is required by reviewers with write access.\\n\\n\",\n  \"documentation_url\": \"https://docs.github.com/rest/pulls/pulls#merge",
+      "h8_invalid_token": {
+        "http": "401"
+      },
+      "h9_refs_api": {
+        "body_head": "\r\n{\"message\":\"Repository rule violations found\\n\\nAt least 1 approving review is required by reviewers with write access.\\n\\n\",\"documentation_url\":\"https://docs.github.com/rest/git/refs#update-a-reference\",\"status\":\"422\"}gh: Repository rule violations found\n\nAt least 1 approving review is required by reviewers with write access.\n\n (HTTP 422)",
+        "http": "422"
+      },
+      "pr": 26,
+      "pr_head": "f2ca433e527290582828a4e578ea74d9a0fcfb17",
+      "protected_sha_after": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "protected_sha_before": "fa9afad4188276262bf0b6e61f2775f04fa54c75",
+      "ref_unchanged": true
+    }
+  }
+]
